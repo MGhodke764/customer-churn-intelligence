@@ -147,6 +147,22 @@ st.divider()
 
 st.subheader("👥 Customer Segmentation")
 
+# Create business-friendly segment names if only CustomerSegment exists
+if "Segment Name" not in df.columns:
+
+    segment_mapping = {
+        0: "New / Low-Engagement",
+        1: "High-Value Loyal",
+        2: "Long-Term Low-Spend",
+        3: "High-Risk / At-Risk"
+    }
+
+    df["Segment Name"] = (
+        df["CustomerSegment"]
+        .map(segment_mapping)
+        .fillna("Other")
+    )
+
 segment_data = (
     df.groupby("Segment Name")
     .agg(
@@ -158,7 +174,9 @@ segment_data = (
     .reset_index()
 )
 
-segment_data["ChurnRate"] *= 100
+segment_data["ChurnRate"] = (
+    segment_data["ChurnRate"] * 100
+)
 
 st.dataframe(
     segment_data.round(2),
