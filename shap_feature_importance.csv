@@ -1,0 +1,36 @@
+Feature,MeanAbsSHAP
+cat__Contract_Two year,0.5205326
+num__tenure,0.48456594
+num__SupportRisk,0.39517945
+cat__Contract_One year,0.23930213
+cat__InternetService_Fiber optic,0.23134436
+num__AvgMonthlySpend,0.20258047
+num__TotalCharges,0.19223052
+cat__PaymentMethod_Electronic check,0.1792415
+num__MonthlyCharges,0.17655052
+cat__PaperlessBilling_Yes,0.1499521
+cat__MultipleLines_Yes,0.10251406
+cat__OnlineBackup_Yes,0.07572123
+cat__StreamingMovies_Yes,0.06346222
+cat__PhoneService_Yes,0.05637743
+cat__StreamingTV_Yes,0.05572043
+cat__Dependents_Yes,0.05303596
+num__SeniorCitizen,0.048837725
+cat__InternetService_No,0.043933906
+num__CustomerLifetimeValue,0.033026796
+cat__gender_Male,0.02685547
+cat__Partner_Yes,0.026697539
+cat__OnlineSecurity_Yes,0.026056167
+num__ServiceCount,0.025588056
+cat__DeviceProtection_Yes,0.019876348
+cat__PaymentMethod_Mailed check,0.019024106
+cat__PaymentMethod_Credit card (automatic),0.015011967
+cat__TechSupport_Yes,0.012456589
+cat__MultipleLines_No phone service,0.008403861
+cat__OnlineSecurity_No internet service,0.0049889334
+num__HighValueCustomer,0.0047986023
+cat__DeviceProtection_No internet service,0.0
+cat__StreamingTV_No internet service,0.0
+cat__TechSupport_No internet service,0.0
+cat__OnlineBackup_No internet service,0.0
+cat__StreamingMovies_No internet service,0.0
