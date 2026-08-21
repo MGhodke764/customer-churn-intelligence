@@ -11,32 +11,27 @@ st.set_page_config(
     page_title="Customer Churn Intelligence",
     page_icon="◆",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # ============================================================
-# PROFESSIONAL UI CSS
+# CSS
 # ============================================================
 
 st.markdown("""
 <style>
 
-html, body, [class*="css"] {
-    font-family: Inter, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
-}
+/* ---------- GLOBAL ---------- */
 
 .stApp {
-    background: #F5F7FB;
+    background: #F6F8FC;
 }
 
-/* Main container */
 .block-container {
-    max-width: 1450px;
-    padding: 28px 45px 50px 45px !important;
+    padding: 2rem 2.5rem 3rem 2.5rem !important;
+    max-width: 1500px;
 }
 
-/* Hide Streamlit branding */
 #MainMenu {
     visibility: hidden;
 }
@@ -45,73 +40,96 @@ footer {
     visibility: hidden;
 }
 
-[data-testid="stDecoration"] {
-    display: none;
+/* ---------- SIDEBAR ---------- */
+
+section[data-testid="stSidebar"] {
+    background: #111827;
+    border-right: 1px solid #1F2937;
 }
 
-/* ============================================================
-   HEADER
-   ============================================================ */
-
-.header-box {
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
-    border-radius: 18px;
-    padding: 22px 26px;
-    margin-bottom: 18px;
-    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+section[data-testid="stSidebar"] > div {
+    padding-top: 1.5rem;
 }
 
-.header-title {
-    font-size: 27px;
+.sidebar-brand {
+    color: white;
+    font-size: 21px;
     font-weight: 800;
-    color: #111827;
     margin-bottom: 3px;
 }
 
-.header-subtitle {
-    font-size: 13px;
-    color: #6B7280;
+.sidebar-subtitle {
+    color: #94A3B8;
+    font-size: 11px;
+    margin-bottom: 28px;
 }
 
-/* ============================================================
-   NAVIGATION
-   ============================================================ */
+.sidebar-section {
+    color: #64748B;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+    margin-top: 18px;
+    margin-bottom: 8px;
+}
 
-div.stButton > button {
+/* Sidebar buttons */
+
+section[data-testid="stSidebar"] .stButton > button {
     width: 100%;
-    min-height: 45px;
-    border-radius: 11px;
-    border: 1px solid #DDE3EC;
-    background: #FFFFFF;
-    color: #344054;
-    font-weight: 700;
+    background: transparent !important;
+    color: #CBD5E1 !important;
+    border: 1px solid transparent !important;
+    border-radius: 9px !important;
+    text-align: left !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    min-height: 42px !important;
+    margin-bottom: 5px !important;
+}
+
+section[data-testid="stSidebar"] .stButton > button:hover {
+    background: #1E293B !important;
+    color: #FFFFFF !important;
+    border-color: #334155 !important;
+}
+
+section[data-testid="stSidebar"] .stButton > button:focus {
+    background: #2563EB !important;
+    color: white !important;
+    border-color: #2563EB !important;
+}
+
+/* ---------- HEADER ---------- */
+
+.header-card {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin-bottom: 25px;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+}
+
+.header-title {
+    color: #111827;
+    font-size: 27px;
+    font-weight: 800;
+}
+
+.header-subtitle {
+    color: #667085;
     font-size: 13px;
-    transition: all 0.2s ease;
+    margin-top: 4px;
 }
 
-div.stButton > button:hover {
-    border-color: #2563EB;
-    color: #2563EB;
-    background: #EFF6FF;
-}
-
-div.stButton > button:focus {
-    border-color: #2563EB;
-    color: #FFFFFF;
-    background: #2563EB;
-}
-
-/* ============================================================
-   PAGE TITLE
-   ============================================================ */
+/* ---------- PAGE TITLE ---------- */
 
 .page-label {
     color: #2563EB;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 1.5px;
-    margin-top: 25px;
     margin-bottom: 5px;
 }
 
@@ -119,7 +137,6 @@ div.stButton > button:focus {
     color: #101828;
     font-size: 32px;
     font-weight: 800;
-    margin-bottom: 4px;
 }
 
 .page-description {
@@ -128,14 +145,12 @@ div.stButton > button:focus {
     margin-bottom: 25px;
 }
 
-/* ============================================================
-   KPI CARDS
-   ============================================================ */
+/* ---------- KPI ---------- */
 
 .kpi-card {
-    background: #FFFFFF;
+    background: white;
     border: 1px solid #E4E7EC;
-    border-radius: 15px;
+    border-radius: 14px;
     padding: 20px;
     min-height: 105px;
     box-shadow: 0 3px 12px rgba(16, 24, 40, 0.035);
@@ -152,12 +167,10 @@ div.stButton > button:focus {
     color: #101828;
     font-size: 27px;
     font-weight: 800;
-    margin-top: 9px;
+    margin-top: 8px;
 }
 
-/* ============================================================
-   SECTION TITLES
-   ============================================================ */
+/* ---------- SECTION ---------- */
 
 .section-title {
     color: #101828;
@@ -167,14 +180,12 @@ div.stButton > button:focus {
     margin-bottom: 14px;
 }
 
-/* ============================================================
-   CUSTOMER PROFILE
-   ============================================================ */
+/* ---------- PROFILE ---------- */
 
 .profile-card {
-    background: #FFFFFF;
+    background: white;
     border: 1px solid #E4E7EC;
-    border-radius: 16px;
+    border-radius: 15px;
     padding: 23px;
     margin-top: 18px;
     box-shadow: 0 3px 12px rgba(16, 24, 40, 0.035);
@@ -191,88 +202,64 @@ div.stButton > button:focus {
     color: #101828;
     font-size: 27px;
     font-weight: 800;
-    margin-top: 7px;
+    margin-top: 6px;
 }
 
-/* ============================================================
-   RISK BADGES
-   ============================================================ */
+/* ---------- RISK BADGES ---------- */
 
 .risk-low {
     display: inline-block;
-    margin-top: 10px;
-    padding: 6px 12px;
-    border-radius: 20px;
     background: #ECFDF3;
     color: #027A48;
+    padding: 6px 12px;
+    border-radius: 20px;
     font-size: 12px;
     font-weight: 800;
+    margin-top: 10px;
 }
 
 .risk-medium {
     display: inline-block;
-    margin-top: 10px;
-    padding: 6px 12px;
-    border-radius: 20px;
     background: #FFFAEB;
     color: #B54708;
+    padding: 6px 12px;
+    border-radius: 20px;
     font-size: 12px;
     font-weight: 800;
+    margin-top: 10px;
 }
 
 .risk-high {
     display: inline-block;
-    margin-top: 10px;
-    padding: 6px 12px;
-    border-radius: 20px;
     background: #FFF4ED;
     color: #C4320A;
+    padding: 6px 12px;
+    border-radius: 20px;
     font-size: 12px;
     font-weight: 800;
+    margin-top: 10px;
 }
 
 .risk-critical {
     display: inline-block;
-    margin-top: 10px;
-    padding: 6px 12px;
-    border-radius: 20px;
     background: #FEF3F2;
     color: #B42318;
+    padding: 6px 12px;
+    border-radius: 20px;
     font-size: 12px;
     font-weight: 800;
+    margin-top: 10px;
 }
 
-/* ============================================================
-   SELECT BOX
-   ============================================================ */
+/* ---------- SELECTBOX ---------- */
 
 div[data-baseweb="select"] > div {
-    border-radius: 10px !important;
+    border-radius: 9px !important;
     border-color: #D0D5DD !important;
-    background: #FFFFFF !important;
+    background: white !important;
 }
 
-div[data-baseweb="select"] > div:hover {
-    border-color: #2563EB !important;
-}
-
-/* ============================================================
-   INFO BOX
-   ============================================================ */
-
-.info-box {
-    background: #EFF6FF;
-    border: 1px solid #BFDBFE;
-    border-radius: 12px;
-    padding: 15px 18px;
-    color: #1E40AF;
-    font-size: 13px;
-    margin-top: 15px;
-}
-
-/* ============================================================
-   FOOTER
-   ============================================================ */
+/* ---------- FOOTER ---------- */
 
 .footer {
     margin-top: 45px;
@@ -298,20 +285,17 @@ def load_data():
 
     df.columns = df.columns.str.strip()
 
-    # -------------------------------
     # Customer ID
-    # -------------------------------
-
     if "customerID" not in df.columns:
 
-        possible = [
+        possible_id = [
             c for c in df.columns
             if c.lower().replace("_", "").replace(" ", "")
             == "customerid"
         ]
 
-        if possible:
-            df["customerID"] = df[possible[0]]
+        if possible_id:
+            df["customerID"] = df[possible_id[0]]
 
         else:
             df["customerID"] = [
@@ -319,10 +303,7 @@ def load_data():
                 for i in range(1, len(df) + 1)
             ]
 
-    # -------------------------------
     # Churn flag
-    # -------------------------------
-
     if "ChurnFlag" not in df.columns:
 
         if "Churn" in df.columns:
@@ -344,10 +325,7 @@ def load_data():
         else:
             df["ChurnFlag"] = 0
 
-    # -------------------------------
     # Churn probability
-    # -------------------------------
-
     if "ChurnProbability" not in df.columns:
 
         if "ChurnProbabilityPct" in df.columns:
@@ -374,10 +352,7 @@ def load_data():
         .clip(0, 1)
     )
 
-    # -------------------------------
     # Risk level
-    # -------------------------------
-
     df["RiskLevel"] = np.select(
         [
             df["ChurnProbability"] >= 0.70,
@@ -392,10 +367,7 @@ def load_data():
         default="Low"
     )
 
-    # -------------------------------
     # Segment
-    # -------------------------------
-
     if "Segment Name" not in df.columns:
 
         if "CustomerSegment" in df.columns:
@@ -435,37 +407,127 @@ def load_data():
 
 
 # ============================================================
-# DATA
+# LOAD
 # ============================================================
 
 try:
 
     df = load_data()
 
-except Exception as e:
+except FileNotFoundError:
 
     st.error(
-        "Dataset could not be loaded. "
-        "Make sure telco_churn_powerbi.csv is in the GitHub repository."
+        "telco_churn_powerbi.csv was not found. "
+        "Make sure it is uploaded to the same GitHub repository."
     )
+
+    st.stop()
+
+except Exception as e:
+
+    st.error(f"Error loading dataset: {e}")
 
     st.stop()
 
 
 # ============================================================
-# HEADER
+# SESSION STATE
+# ============================================================
+
+if "page" not in st.session_state:
+    st.session_state.page = "Overview"
+
+
+# ============================================================
+# SIDEBAR
+# ============================================================
+
+with st.sidebar:
+
+    st.markdown(
+        """
+        <div class="sidebar-brand">
+            ◆ Customer Intelligence
+        </div>
+
+        <div class="sidebar-subtitle">
+            AI-Powered Customer Retention
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        '<div class="sidebar-section">DASHBOARD</div>',
+        unsafe_allow_html=True
+    )
+
+    if st.button(
+        "▣   Overview",
+        use_container_width=True
+    ):
+        st.session_state.page = "Overview"
+        st.rerun()
+
+    if st.button(
+        "◉   Risk Analytics",
+        use_container_width=True
+    ):
+        st.session_state.page = "Risk"
+        st.rerun()
+
+    if st.button(
+        "○   Customer Segmentation",
+        use_container_width=True
+    ):
+        st.session_state.page = "Segments"
+        st.rerun()
+
+    if st.button(
+        "✦   Churn Drivers",
+        use_container_width=True
+    ):
+        st.session_state.page = "Drivers"
+        st.rerun()
+
+    st.markdown(
+        '<div class="sidebar-section">CUSTOMER</div>',
+        unsafe_allow_html=True
+    )
+
+    if st.button(
+        "⌕   Customer Explorer",
+        use_container_width=True
+    ):
+        st.session_state.page = "Customers"
+        st.rerun()
+
+    st.markdown("---")
+
+    st.caption(
+        f"Customers: {len(df):,}"
+    )
+
+    st.caption(
+        "Machine Learning • Analytics"
+    )
+
+
+# ============================================================
+# TOP HEADER
 # ============================================================
 
 st.markdown(
     """
-    <div class="header-box">
+    <div class="header-card">
 
         <div class="header-title">
-            ◆ Customer Intelligence
+            Customer Churn Intelligence
         </div>
 
         <div class="header-subtitle">
-            AI-Powered Customer Retention Analytics
+            AI-powered analytics for customer retention,
+            segmentation and churn risk management
         </div>
 
     </div>
@@ -475,73 +537,23 @@ st.markdown(
 
 
 # ============================================================
-# NAVIGATION BUTTONS
-# ============================================================
-
-if "page" not in st.session_state:
-    st.session_state.page = "Overview"
-
-n1, n2, n3, n4, n5 = st.columns(5)
-
-with n1:
-    if st.button(
-        "▣  Overview",
-        use_container_width=True
-    ):
-        st.session_state.page = "Overview"
-        st.rerun()
-
-with n2:
-    if st.button(
-        "◉  Risk Analytics",
-        use_container_width=True
-    ):
-        st.session_state.page = "Risk"
-        st.rerun()
-
-with n3:
-    if st.button(
-        "○  Segments",
-        use_container_width=True
-    ):
-        st.session_state.page = "Segments"
-        st.rerun()
-
-with n4:
-    if st.button(
-        "✦  Churn Drivers",
-        use_container_width=True
-    ):
-        st.session_state.page = "Drivers"
-        st.rerun()
-
-with n5:
-    if st.button(
-        "⌕  Customer Explorer",
-        use_container_width=True
-    ):
-        st.session_state.page = "Customers"
-        st.rerun()
-
-
-# ============================================================
 # OVERVIEW
 # ============================================================
 
 if st.session_state.page == "Overview":
 
     st.markdown(
-        '<div class="page-label">CUSTOMER INTELLIGENCE</div>',
+        '<div class="page-label">EXECUTIVE OVERVIEW</div>',
         unsafe_allow_html=True
     )
 
     st.markdown(
-        '<div class="page-title">Customer Churn Intelligence</div>',
+        '<div class="page-title">Customer Health Dashboard</div>',
         unsafe_allow_html=True
     )
 
     st.markdown(
-        '<div class="page-description">Monitor customer health, identify churn risk, and prioritize retention opportunities.</div>',
+        '<div class="page-description">A high-level view of customer churn, risk and retention opportunities.</div>',
         unsafe_allow_html=True
     )
 
@@ -612,7 +624,7 @@ if st.session_state.page == "Overview":
 
     with left:
 
-        risk = (
+        risk_data = (
             df["RiskLevel"]
             .value_counts()
             .reindex(
@@ -627,13 +639,13 @@ if st.session_state.page == "Overview":
             .reset_index()
         )
 
-        risk.columns = [
+        risk_data.columns = [
             "Risk Level",
             "Customers"
         ]
 
         fig = px.bar(
-            risk,
+            risk_data,
             x="Risk Level",
             y="Customers",
             text="Customers",
@@ -646,7 +658,13 @@ if st.session_state.page == "Overview":
 
         fig.update_layout(
             template="plotly_white",
-            height=420
+            height=420,
+            margin=dict(
+                l=20,
+                r=20,
+                t=60,
+                b=20
+            )
         )
 
         st.plotly_chart(
@@ -685,7 +703,13 @@ if st.session_state.page == "Overview":
 
             fig.update_layout(
                 template="plotly_white",
-                height=420
+                height=420,
+                margin=dict(
+                    l=20,
+                    r=20,
+                    t=60,
+                    b=20
+                )
             )
 
             st.plotly_chart(
@@ -711,7 +735,7 @@ elif st.session_state.page == "Risk":
     )
 
     st.markdown(
-        '<div class="page-description">Explore predicted churn probability across your customer base.</div>',
+        '<div class="page-description">Identify customers requiring immediate or proactive retention action.</div>',
         unsafe_allow_html=True
     )
 
@@ -734,7 +758,7 @@ elif st.session_state.page == "Risk":
 
     if len(risk_df) > 0:
 
-        x = (
+        x_axis = (
             "tenure"
             if "tenure" in risk_df.columns
             else "ChurnProbability"
@@ -742,21 +766,53 @@ elif st.session_state.page == "Risk":
 
         fig = px.scatter(
             risk_df,
-            x=x,
+            x=x_axis,
             y="ChurnProbability",
             color="RiskLevel",
-            hover_data=["customerID"],
+            hover_data=[
+                "customerID"
+            ],
             title="Customer Risk Map"
         )
 
         fig.update_layout(
             template="plotly_white",
-            height=500
+            height=520
         )
 
         st.plotly_chart(
             fig,
             use_container_width=True
+        )
+
+        columns = [
+            c for c in [
+                "customerID",
+                "ChurnProbability",
+                "RiskLevel",
+                "tenure",
+                "MonthlyCharges",
+                "Contract"
+            ]
+            if c in risk_df.columns
+        ]
+
+        st.dataframe(
+            risk_df[
+                columns
+            ]
+            .sort_values(
+                "ChurnProbability",
+                ascending=False
+            ),
+            use_container_width=True,
+            hide_index=True
+        )
+
+    else:
+
+        st.info(
+            "No customers match the selected risk threshold."
         )
 
 
@@ -777,24 +833,40 @@ elif st.session_state.page == "Segments":
     )
 
     st.markdown(
-        '<div class="page-description">Compare customer groups and understand their churn behavior.</div>',
+        '<div class="page-description">Understand customer groups and compare their churn behavior.</div>',
         unsafe_allow_html=True
+    )
+
+    # Safety fix for previous KeyError
+    if "Segment Name" not in df.columns:
+        df["Segment Name"] = "Other"
+
+    df["Segment Name"] = (
+        df["Segment Name"]
+        .fillna("Other")
+        .astype(str)
     )
 
     summary = (
         df.groupby("Segment Name")
         .agg(
-            Customers=("customerID", "count"),
-            Churn_Rate=("ChurnFlag", "mean")
+            Customers=(
+                "customerID",
+                "count"
+            ),
+            Churn_Rate=(
+                "ChurnFlag",
+                "mean"
+            )
         )
         .reset_index()
     )
 
     summary["Churn_Rate"] *= 100
 
-    a, b = st.columns(2)
+    left, right = st.columns(2)
 
-    with a:
+    with left:
 
         fig = px.bar(
             summary,
@@ -804,9 +876,13 @@ elif st.session_state.page == "Segments":
             title="Customers by Segment"
         )
 
+        fig.update_traces(
+            textposition="outside"
+        )
+
         fig.update_layout(
             template="plotly_white",
-            height=420
+            height=430
         )
 
         st.plotly_chart(
@@ -814,7 +890,7 @@ elif st.session_state.page == "Segments":
             use_container_width=True
         )
 
-    with b:
+    with right:
 
         fig = px.bar(
             summary,
@@ -831,7 +907,8 @@ elif st.session_state.page == "Segments":
 
         fig.update_layout(
             template="plotly_white",
-            height=420
+            height=430,
+            yaxis_title="Churn Rate (%)"
         )
 
         st.plotly_chart(
@@ -863,7 +940,7 @@ elif st.session_state.page == "Drivers":
     )
 
     st.markdown(
-        '<div class="page-description">Understand the factors associated with customer churn.</div>',
+        '<div class="page-description">Understand which factors contribute most strongly to customer churn.</div>',
         unsafe_allow_html=True
     )
 
@@ -915,11 +992,14 @@ elif st.session_state.page == "Drivers":
                 ]
             )
 
-            top = shap.nlargest(
-                12,
-                importance_col
-            ).sort_values(
-                importance_col
+            top = (
+                shap.nlargest(
+                    12,
+                    importance_col
+                )
+                .sort_values(
+                    importance_col
+                )
             )
 
             fig = px.bar(
@@ -943,13 +1023,14 @@ elif st.session_state.page == "Drivers":
         else:
 
             st.warning(
-                "Feature importance columns could not be detected."
+                "Feature importance columns were not detected."
             )
 
     except FileNotFoundError:
 
         st.info(
-            "Upload shap_feature_importance.csv to show model drivers."
+            "Upload shap_feature_importance.csv "
+            "to display your model's churn drivers."
         )
 
 
@@ -974,20 +1055,19 @@ elif st.session_state.page == "Customers":
         unsafe_allow_html=True
     )
 
-    # Customer dropdown
+    # Customer ID dropdown
 
     customer_ids = sorted(
         df["customerID"]
-        .astype(str)
         .dropna()
+        .astype(str)
         .unique()
         .tolist()
     )
 
     selected_id = st.selectbox(
         "Search Customer ID",
-        customer_ids,
-        index=0
+        customer_ids
     )
 
     customer = df[
@@ -999,7 +1079,7 @@ elif st.session_state.page == "Customers":
         customer["ChurnProbability"]
     )
 
-    # Risk
+    # Risk badge
 
     if probability >= 0.70:
 
@@ -1020,8 +1100,6 @@ elif st.session_state.page == "Customers":
 
         risk_text = "Low Risk"
         risk_class = "risk-low"
-
-    # Profile
 
     st.markdown(
         f"""
@@ -1044,7 +1122,7 @@ elif st.session_state.page == "Customers":
         unsafe_allow_html=True
     )
 
-    # Metrics
+    # Customer metrics
 
     st.markdown(
         '<div class="section-title">Customer Metrics</div>',
@@ -1079,24 +1157,28 @@ elif st.session_state.page == "Customers":
         total_charges = 0
 
     with a:
+
         st.metric(
             "Tenure",
             f"{tenure} months"
         )
 
     with b:
+
         st.metric(
             "Monthly Charges",
             f"${monthly:,.2f}"
         )
 
     with c:
+
         st.metric(
             "Total Charges",
             f"${total_charges:,.2f}"
         )
 
     with d:
+
         st.metric(
             "Churn Probability",
             f"{probability:.1%}"
@@ -1120,7 +1202,6 @@ elif st.session_state.page == "Customers":
     ]:
 
         if column in df.columns:
-
             details[column] = customer[column]
 
     if details:
@@ -1156,7 +1237,7 @@ elif st.session_state.page == "Customers":
 
         recommendation = (
             "Proactive retention campaign recommended. "
-            "Review contract, engagement, and service experience."
+            "Review contract, engagement and service experience."
         )
 
     elif probability >= 0.35:
@@ -1185,12 +1266,9 @@ st.markdown(
     """
     <div class="footer">
         Customer Churn Intelligence
-        &nbsp;•&nbsp;
-        Machine Learning
-        &nbsp;•&nbsp;
-        Customer Segmentation
-        &nbsp;•&nbsp;
-        Explainable AI
+        • Machine Learning
+        • Customer Segmentation
+        • Explainable AI
     </div>
     """,
     unsafe_allow_html=True
