@@ -1,1613 +1,1567 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.express as px
-import plotly.graph_objects as go
 
-# =========================================================
+# ============================================================
 # PAGE CONFIG
-# =========================================================
+# ============================================================
 
 st.set_page_config(
-    page_title="ChurnIQ | Customer Intelligence",
-    page_icon="◈",
+    page_title="Customer Intelligence",
+    page_icon="◆",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# =========================================================
-# PROFESSIONAL CSS
-# =========================================================
+# ============================================================
+# CUSTOM CSS
+# ============================================================
 
 st.markdown("""
 <style>
 
-/* ================= GLOBAL ================= */
+/* ---------------------------------------------------------
+   GLOBAL
+--------------------------------------------------------- */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
 
 .stApp {
-    background: #F6F8FC;
-    color: #0F172A;
+    background: #F5F7FB;
 }
 
 .block-container {
-    padding-top: 5rem !important;
-    padding-bottom: 3rem !important;
-    max-width: 1500px;
+    padding-top: 2.5rem;
+    padding-bottom: 3rem;
+    max-width: 1450px;
 }
 
-#MainMenu,
-footer,
-[data-testid="stDecoration"] {
-    visibility: hidden;
+/* Remove Streamlit top spacing */
+[data-testid="stHeader"] {
+    background: transparent;
 }
 
-/* ================= SIDEBAR ================= */
+/* ---------------------------------------------------------
+   SIDEBAR
+--------------------------------------------------------- */
 
 section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0A1020 0%, #111827 100%);
+    background: #0B1424;
     border-right: 1px solid #1E293B;
 }
 
 section[data-testid="stSidebar"] > div {
-    padding-top: 1rem;
+    padding: 1.5rem 1rem;
 }
 
-section[data-testid="stSidebar"] * {
-    color: #E5E7EB;
-}
-
-.brand {
-    padding: 8px 5px 25px;
+/* Sidebar brand */
+.brand-box {
+    padding: 12px 8px 25px 8px;
 }
 
 .brand-mark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 11px;
-    background: linear-gradient(135deg, #2563EB, #60A5FA);
-    color: white;
-    font-size: 18px;
-    font-weight: 900;
-    margin-right: 9px;
-}
-
-.brand-name {
-    color: white;
-    font-size: 21px;
-    font-weight: 850;
-    letter-spacing: -0.6px;
+    font-size: 25px;
+    font-weight: 800;
+    color: #FFFFFF;
+    letter-spacing: -0.5px;
 }
 
 .brand-sub {
     color: #94A3B8;
-    font-size: 11px;
-    margin-top: 8px;
+    font-size: 12px;
+    margin-top: 6px;
+    font-weight: 500;
 }
 
-.nav-label {
+/* Sidebar headings */
+.sidebar-section-title {
     color: #64748B;
     font-size: 10px;
     font-weight: 800;
-    letter-spacing: 1.4px;
-    text-transform: uppercase;
-    margin: 14px 0 8px 3px;
+    letter-spacing: 2px;
+    margin-top: 25px;
+    margin-bottom: 10px;
 }
+
+/* ---------------------------------------------------------
+   SIDEBAR NAV BUTTONS
+--------------------------------------------------------- */
 
 section[data-testid="stSidebar"] .stButton > button {
     width: 100%;
-    min-height: 43px;
-    text-align: left;
+    min-height: 42px;
+    border-radius: 9px;
     border: 1px solid transparent;
-    border-radius: 10px;
     background: transparent;
-    color: #CBD5E1;
-    font-weight: 600;
+    color: #CBD5E1 !important;
     font-size: 13px;
-    padding: 0.55rem 0.8rem;
-    margin: 2px 0;
-    transition: all .2s ease;
+    font-weight: 600;
+    text-align: left;
+    padding: 9px 13px;
+    transition: all 0.2s ease;
+    box-shadow: none;
+}
+
+section[data-testid="stSidebar"] .stButton > button p {
+    color: #CBD5E1 !important;
+    font-weight: 600;
 }
 
 section[data-testid="stSidebar"] .stButton > button:hover {
-    background: #1B2638;
-    border-color: #334155;
-    color: white;
+    background: #172338;
+    border-color: #263752;
+    color: #FFFFFF !important;
     transform: translateX(2px);
 }
 
-.side-card {
-    margin-top: 20px;
-    padding: 15px;
-    border: 1px solid #263449;
-    background: rgba(255,255,255,.035);
-    border-radius: 13px;
+section[data-testid="stSidebar"] .stButton > button:hover p {
+    color: #FFFFFF !important;
 }
 
-.side-card-title {
-    color: #94A3B8;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 800;
+/* ---------------------------------------------------------
+   QUICK ACTION BUTTONS
+--------------------------------------------------------- */
+
+.quick-action {
+    margin-top: 5px;
 }
 
-.side-model {
-    color: white;
-    font-size: 14px;
+section[data-testid="stSidebar"] .quick-btn .stButton > button {
+    background: #172033 !important;
+    border: 1px solid #334155 !important;
+    color: #E2E8F0 !important;
+}
+
+section[data-testid="stSidebar"] .quick-btn .stButton > button p {
+    color: #E2E8F0 !important;
+}
+
+section[data-testid="stSidebar"] .quick-btn .stButton > button:hover {
+    background: #24324A !important;
+    border-color: #4F8CFF !important;
+}
+
+section[data-testid="stSidebar"] .quick-btn .stButton > button:hover p {
+    color: #FFFFFF !important;
+}
+
+/* ---------------------------------------------------------
+   SIDEBAR MODEL CARD
+--------------------------------------------------------- */
+
+.model-card {
+    background: #111D31;
+    border: 1px solid #23324A;
+    border-radius: 12px;
+    padding: 14px;
+    margin-top: 25px;
+}
+
+.model-title {
+    color: #FFFFFF;
+    font-size: 13px;
     font-weight: 700;
-    margin-top: 8px;
 }
 
-.side-row {
-    display: flex;
-    justify-content: space-between;
-    padding-top: 10px;
-    font-size: 11px;
-    color: #94A3B8;
+.model-value {
+    color: #60A5FA;
+    font-size: 22px;
+    font-weight: 800;
+    margin-top: 6px;
 }
 
-.side-row b {
-    color: #E2E8F0;
-}
-
-/* ================= HEADER ================= */
-
-.product-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 10px 0 23px;
-    border-bottom: 1px solid #E2E8F0;
-    margin-bottom: 26px;
-}
-
-.eyebrow {
-    color: #2563EB;
+.model-label {
+    color: #64748B;
     font-size: 10px;
-    font-weight: 850;
-    text-transform: uppercase;
-    letter-spacing: 1.7px;
-    margin-bottom: 9px;
+    margin-top: 3px;
 }
 
-.main-title {
-    color: #0F172A;
-    font-size: 35px;
-    line-height: 1.05;
-    font-weight: 850;
-    letter-spacing: -1.4px;
+/* ---------------------------------------------------------
+   MAIN HEADER
+--------------------------------------------------------- */
+
+.hero {
+    background: linear-gradient(135deg, #0F172A 0%, #172554 100%);
+    border-radius: 18px;
+    padding: 28px 32px;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(15,23,42,0.12);
+}
+
+.hero-eyebrow {
+    color: #93C5FD;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 7px;
+}
+
+.hero-title {
+    color: #FFFFFF;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
     margin: 0;
 }
 
-.main-subtitle {
-    color: #64748B;
-    font-size: 13px;
-    margin-top: 9px;
+.hero-subtitle {
+    color: #CBD5E1;
+    font-size: 14px;
+    margin-top: 8px;
 }
 
 .status-pill {
-    background: #ECFDF5;
-    border: 1px solid #A7F3D0;
-    color: #047857;
+    display: inline-block;
+    margin-top: 15px;
+    padding: 6px 12px;
     border-radius: 999px;
-    padding: 8px 13px;
+    background: rgba(34,197,94,0.12);
+    color: #86EFAC;
     font-size: 11px;
-    font-weight: 800;
-    white-space: nowrap;
+    font-weight: 700;
 }
 
-/* ================= KPI ================= */
-
-.kpi-card {
-    background: white;
-    border: 1px solid #E2E8F0;
-    border-radius: 15px;
-    padding: 19px;
-    min-height: 132px;
-    box-shadow: 0 5px 18px rgba(15,23,42,.04);
-    transition: all .2s ease;
-}
-
-.kpi-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 9px 25px rgba(15,23,42,.08);
-}
-
-.kpi-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.kpi-label {
-    color: #64748B;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: .9px;
-}
-
-.kpi-icon {
-    width: 31px;
-    height: 31px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #EFF6FF;
-    color: #2563EB;
-    border-radius: 9px;
-    font-weight: 800;
-}
-
-.kpi-value {
-    color: #0F172A;
-    font-size: 28px;
-    font-weight: 850;
-    letter-spacing: -.8px;
-    margin-top: 13px;
-}
-
-.kpi-description {
-    color: #94A3B8;
-    font-size: 10px;
-    margin-top: 4px;
-}
-
-/* ================= SECTION ================= */
+/* ---------------------------------------------------------
+   SECTION HEADINGS
+--------------------------------------------------------- */
 
 .section-title {
-    font-size: 19px;
-    font-weight: 850;
+    font-size: 21px;
+    font-weight: 800;
     color: #0F172A;
-    letter-spacing: -.35px;
-    margin-top: 30px;
-    margin-bottom: 13px;
+    letter-spacing: -0.4px;
+    margin-top: 25px;
+    margin-bottom: 5px;
 }
 
 .section-subtitle {
     color: #64748B;
     font-size: 12px;
-    margin-top: -7px;
     margin-bottom: 16px;
 }
 
-/* ================= INSIGHT ================= */
+/* ---------------------------------------------------------
+   KPI CARDS
+--------------------------------------------------------- */
+
+.kpi-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 20px;
+    min-height: 125px;
+    box-shadow: 0 3px 12px rgba(15,23,42,0.04);
+}
+
+.kpi-label {
+    color: #64748B;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.kpi-value {
+    color: #0F172A;
+    font-size: 28px;
+    font-weight: 800;
+    margin-top: 9px;
+}
+
+.kpi-note {
+    color: #94A3B8;
+    font-size: 10px;
+    margin-top: 5px;
+}
+
+/* ---------------------------------------------------------
+   CONTENT CARDS
+--------------------------------------------------------- */
+
+.content-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 3px 12px rgba(15,23,42,0.035);
+}
+
+/* ---------------------------------------------------------
+   INSIGHT CARD
+--------------------------------------------------------- */
 
 .insight-card {
-    background: linear-gradient(135deg,#EFF6FF 0%,#F8FAFC 100%);
+    background: #EFF6FF;
     border: 1px solid #BFDBFE;
-    border-radius: 15px;
-    padding: 18px 20px;
+    border-radius: 14px;
+    padding: 20px 22px;
+    margin-top: 15px;
 }
 
 .insight-title {
     color: #1D4ED8;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 850;
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 7px;
 }
 
 .insight-text {
-    color: #1E3A8A;
+    color: #334155;
     font-size: 13px;
-    line-height: 1.6;
-    margin-top: 7px;
+    line-height: 1.7;
 }
 
-/* ================= RISK CARDS ================= */
-
-.risk-critical,
-.risk-high,
-.risk-medium,
-.risk-low {
-    border-radius: 14px;
-    padding: 18px;
-    border: 1px solid;
-}
+/* ---------------------------------------------------------
+   RISK BADGES
+--------------------------------------------------------- */
 
 .risk-critical {
+    display: inline-block;
     background: #FEF2F2;
-    border-color: #FECACA;
+    color: #DC2626;
+    border: 1px solid #FECACA;
+    border-radius: 999px;
+    padding: 6px 11px;
+    font-size: 11px;
+    font-weight: 700;
 }
 
 .risk-high {
+    display: inline-block;
     background: #FFF7ED;
-    border-color: #FED7AA;
+    color: #EA580C;
+    border: 1px solid #FED7AA;
+    border-radius: 999px;
+    padding: 6px 11px;
+    font-size: 11px;
+    font-weight: 700;
 }
 
 .risk-medium {
-    background: #FFFBEB;
-    border-color: #FDE68A;
+    display: inline-block;
+    background: #FEFCE8;
+    color: #CA8A04;
+    border: 1px solid #FEF08A;
+    border-radius: 999px;
+    padding: 6px 11px;
+    font-size: 11px;
+    font-weight: 700;
 }
 
 .risk-low {
+    display: inline-block;
     background: #F0FDF4;
-    border-color: #BBF7D0;
+    color: #16A34A;
+    border: 1px solid #BBF7D0;
+    border-radius: 999px;
+    padding: 6px 11px;
+    font-size: 11px;
+    font-weight: 700;
 }
 
-/* ================= PROFILE ================= */
+/* ---------------------------------------------------------
+   CUSTOMER PROFILE
+--------------------------------------------------------- */
 
 .profile-card {
-    background: white;
+    background: #FFFFFF;
     border: 1px solid #E2E8F0;
     border-radius: 15px;
-    padding: 22px;
+    padding: 24px;
+    margin-top: 15px;
 }
 
 .profile-title {
-    font-size: 21px;
-    font-weight: 850;
     color: #0F172A;
-}
-
-.profile-label {
-    font-size: 10px;
-    color: #94A3B8;
-    text-transform: uppercase;
-    letter-spacing: .9px;
+    font-size: 22px;
     font-weight: 800;
 }
 
-.profile-value {
-    font-size: 15px;
-    color: #374151;
-    font-weight: 600;
+.profile-subtitle {
+    color: #64748B;
+    font-size: 12px;
+    margin-top: 5px;
 }
 
-/* ================= BUTTONS ================= */
-
-.stButton > button {
-    border-radius: 9px;
-    font-weight: 700;
-}
-
-.stDownloadButton > button {
-    border-radius: 9px;
-    font-weight: 700;
-}
-
-/* ================= INPUTS ================= */
-
-div[data-baseweb="select"] > div {
-    border-radius: 9px;
-}
-
-input {
-    border-radius: 9px !important;
-}
-
-/* ================= TABLE ================= */
-
-[data-testid="stDataFrame"] {
-    border: 1px solid #E2E8F0;
-    border-radius: 12px;
-}
-
-/* ================= FOOTER ================= */
+/* ---------------------------------------------------------
+   FOOTER
+--------------------------------------------------------- */
 
 .footer {
-    border-top: 1px solid #E2E8F0;
-    margin-top: 40px;
-    padding-top: 17px;
     text-align: center;
     color: #94A3B8;
     font-size: 10px;
+    padding: 35px 0 10px 0;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-
-# =========================================================
+# ============================================================
 # LOAD DATA
-# =========================================================
+# ============================================================
 
 @st.cache_data
 def load_data():
 
-    data = pd.read_csv("telco_churn_powerbi.csv")
+    file_names = [
+        "telco_churn_powerbi.csv",
+        "telco_churn.csv",
+        "WA_Fn-UseC_-Telco-Customer-Churn.csv"
+    ]
 
-    # Make sure CustomerSegment exists
-    if "CustomerSegment" in data.columns:
+    for file in file_names:
+        try:
+            df = pd.read_csv(file)
+            return df
+        except:
+            pass
 
-        mapping = {
-            0: "New / Low-Engagement",
-            1: "High-Value Loyal",
-            2: "Long-Term Low-Spend",
-            3: "High-Risk / At-Risk"
-        }
-
-        data["Segment Name"] = (
-            pd.to_numeric(
-                data["CustomerSegment"],
-                errors="coerce"
-            )
-            .map(mapping)
-            .fillna("Other")
-        )
-
-    else:
-
-        data["Segment Name"] = "Other"
-
-    return data
+    return None
 
 
 df = load_data()
 
+if df is None:
+    st.error(
+        "Dataset not found. Upload `telco_churn_powerbi.csv` "
+        "to the same GitHub repository as app.py."
+    )
+    st.stop()
 
-# =========================================================
-# COMMON CALCULATIONS
-# =========================================================
+# ============================================================
+# CLEAN COLUMN NAMES
+# ============================================================
 
-total_customers = df["customerID"].nunique()
+df.columns = df.columns.str.strip()
 
-churned_customers = df.loc[
-    df["ChurnFlag"] == 1,
-    "customerID"
-].nunique()
+# Remove duplicate columns
+df = df.loc[:, ~df.columns.duplicated()]
 
-churn_rate = churned_customers / total_customers
+# ------------------------------------------------------------
+# COLUMN HELPERS
+# ------------------------------------------------------------
 
-high_risk = df[
-    df["RiskLevel"].isin(["High", "Critical"])
-]["customerID"].nunique()
+def find_column(possible_names):
 
-avg_probability = df["ChurnProbability"].mean()
+    for name in possible_names:
+        if name in df.columns:
+            return name
 
-at_risk = df[
-    df["ChurnProbability"] >= 0.35
-]["customerID"].nunique()
+    return None
 
 
-# =========================================================
+customer_col = find_column([
+    "customerID",
+    "CustomerID",
+    "customer_id",
+    "Customer Id"
+])
+
+contract_col = find_column([
+    "Contract",
+    "contract"
+])
+
+tenure_col = find_column([
+    "tenure",
+    "Tenure"
+])
+
+monthly_col = find_column([
+    "MonthlyCharges",
+    "monthly_charges",
+    "Monthly Charges",
+    "AvgMonthlySpend"
+])
+
+total_col = find_column([
+    "TotalCharges",
+    "total_charges",
+    "Total Charges"
+])
+
+churn_col = find_column([
+    "Churn",
+    "churn"
+])
+
+segment_col = find_column([
+    "CustomerSegment",
+    "Customer Segment",
+    "Segment",
+    "Segment Name"
+])
+
+risk_col = find_column([
+    "RiskLevel",
+    "Risk Level",
+    "Risk",
+    "risk_level"
+])
+
+prob_col = find_column([
+    "ChurnProbability",
+    "Churn Probability",
+    "ChurnProb",
+    "PredictedProbability",
+    "ModelRisk",
+    "model_risk"
+])
+
+# ============================================================
+# DATA CLEANING
+# ============================================================
+
+if total_col:
+    df[total_col] = pd.to_numeric(
+        df[total_col].astype(str).str.strip(),
+        errors="coerce"
+    )
+
+if monthly_col:
+    df[monthly_col] = pd.to_numeric(
+        df[monthly_col],
+        errors="coerce"
+    )
+
+if tenure_col:
+    df[tenure_col] = pd.to_numeric(
+        df[tenure_col],
+        errors="coerce"
+    )
+
+# ============================================================
+# CREATE CHURN FLAG
+# ============================================================
+
+if churn_col:
+
+    df["ChurnFlag"] = (
+        df[churn_col]
+        .astype(str)
+        .str.lower()
+        .map({
+            "yes": 1,
+            "no": 0,
+            "1": 1,
+            "0": 0,
+            "true": 1,
+            "false": 0
+        })
+        .fillna(0)
+    )
+
+else:
+    df["ChurnFlag"] = 0
+
+# ============================================================
+# CREATE RISK PROBABILITY
+# ============================================================
+
+if prob_col:
+
+    df["RiskProbability"] = pd.to_numeric(
+        df[prob_col],
+        errors="coerce"
+    )
+
+    # Convert percentage to decimal if required
+    if df["RiskProbability"].max() > 1:
+        df["RiskProbability"] = df["RiskProbability"] / 100
+
+else:
+
+    # If model probability isn't available,
+    # use churn status as fallback
+    df["RiskProbability"] = df["ChurnFlag"].astype(float)
+
+# ============================================================
+# CREATE RISK LEVEL
+# ============================================================
+
+def calculate_risk(x):
+
+    if x >= 0.70:
+        return "Critical"
+
+    elif x >= 0.50:
+        return "High"
+
+    elif x >= 0.35:
+        return "Medium"
+
+    else:
+        return "Low"
+
+
+if risk_col:
+
+    df["RiskLevelFinal"] = df[risk_col].astype(str)
+
+else:
+
+    df["RiskLevelFinal"] = df["RiskProbability"].apply(
+        calculate_risk
+    )
+
+# ============================================================
+# CREATE SEGMENT NAMES
+# ============================================================
+
+if segment_col:
+
+    # Keep original segment
+    df["SegmentID"] = df[segment_col]
+
+else:
+
+    df["SegmentID"] = "Unknown"
+
+# Convert numeric segments into professional names
+segment_names = {
+    0: "Emerging Customers",
+    1: "Loyal High-Value",
+    2: "Loyal Low-Cost",
+    3: "High-Risk New Customers"
+}
+
+def get_segment_name(value):
+
+    try:
+        number = int(float(value))
+
+        if number in segment_names:
+            return segment_names[number]
+
+    except:
+        pass
+
+    return str(value)
+
+
+df["SegmentNameFinal"] = df["SegmentID"].apply(
+    get_segment_name
+)
+
+# ============================================================
+# KPIs
+# ============================================================
+
+total_customers = len(df)
+
+churn_rate = (
+    df["ChurnFlag"].mean() * 100
+    if len(df) > 0 else 0
+)
+
+at_risk = int(
+    (df["RiskProbability"] >= 0.35).sum()
+)
+
+high_critical = int(
+    (df["RiskLevelFinal"].astype(str)
+     .str.lower()
+     .isin(["high", "critical"]))
+    .sum()
+)
+
+avg_model_risk = (
+    df["RiskProbability"].mean() * 100
+    if len(df) > 0 else 0
+)
+
+# ============================================================
+# SESSION STATE
+# ============================================================
+
+if "page" not in st.session_state:
+    st.session_state.page = "Executive Overview"
+
+# ============================================================
 # SIDEBAR
-# =========================================================
+# ============================================================
 
 with st.sidebar:
 
     st.markdown("""
-    <div class="brand">
-
-        <div>
-            <span class="brand-mark">◈</span>
-            <span class="brand-name">CHURNIQ</span>
-        </div>
-
-        <div class="brand-sub">
-            Customer Intelligence Platform
-        </div>
-
+    <div class="brand-box">
+        <div class="brand-mark">◆ Customer Intelligence</div>
+        <div class="brand-sub">AI-Powered Retention Analytics</div>
     </div>
     """, unsafe_allow_html=True)
 
-
     st.markdown(
-        '<div class="nav-label">Workspace</div>',
+        '<div class="sidebar-section-title">WORKSPACE</div>',
         unsafe_allow_html=True
     )
 
+    # Navigation buttons
 
     nav_items = [
-        ("Executive Overview", "▦"),
-        ("Risk Analytics", "◉"),
-        ("Customer Segments", "◌"),
-        ("Churn Drivers", "✦"),
-        ("Customer Explorer", "⌕")
+        ("▣  Executive Overview", "Executive Overview"),
+        ("◉  Risk Analytics", "Risk Analytics"),
+        ("○  Customer Segments", "Customer Segments"),
+        ("✦  Churn Drivers", "Churn Drivers"),
+        ("⌕  Customer Explorer", "Customer Explorer")
     ]
 
-
-    if "page" not in st.session_state:
-
-        st.session_state.page = "Executive Overview"
-
-
-    for page_name, icon in nav_items:
+    for label, page_name in nav_items:
 
         if st.button(
-            f"{icon}   {page_name}",
-            key=f"nav_{page_name}",
+            label,
+            key="nav_" + page_name,
             use_container_width=True
         ):
-
             st.session_state.page = page_name
-            st.session_state.pop(
-                "risk_quick_filter",
-                None
-            )
-
             st.rerun()
 
-
-    page = st.session_state.page
-
-
+    # --------------------------------------------------------
     # QUICK ACTIONS
+    # --------------------------------------------------------
 
     st.markdown(
-        '<div class="nav-label" style="margin-top:20px;">Quick Actions</div>',
+        '<div class="sidebar-section-title">QUICK ACTIONS</div>',
         unsafe_allow_html=True
     )
 
+    st.markdown('<div class="quick-btn">', unsafe_allow_html=True)
 
     if st.button(
-        "⚠   High-Risk Customers",
+        "⚠  High-Risk Customers",
+        key="high_risk_btn",
         use_container_width=True
     ):
-
-        st.session_state.page = "Customer Explorer"
-
-        st.session_state.risk_quick_filter = True
-
+        st.session_state.page = "Risk Analytics"
         st.rerun()
 
-
     if st.button(
-        "↻   Reset Workspace",
+        "↻  Reset Workspace",
+        key="reset_btn",
         use_container_width=True
     ):
-
         st.session_state.page = "Executive Overview"
-
-        st.session_state.pop(
-            "risk_quick_filter",
-            None
-        )
-
         st.rerun()
 
+    st.markdown('</div>', unsafe_allow_html=True)
 
+    # --------------------------------------------------------
     # MODEL CARD
+    # --------------------------------------------------------
 
     st.markdown("""
-    <div class="side-card">
-
-        <div class="side-card-title">
-            Model Status
-        </div>
-
-        <div class="side-model">
-            ● XGBoost Classifier
-        </div>
-
-        <div class="side-row">
-            <span>ROC-AUC</span>
-            <b>0.841</b>
-        </div>
-
-        <div class="side-row">
-            <span>Threshold</span>
-            <b>35%</b>
-        </div>
-
-        <div class="side-row">
-            <span>Explainability</span>
-            <b>SHAP</b>
-        </div>
-
+    <div class="model-card">
+        <div class="model-title">XGBoost Classifier</div>
+        <div class="model-value">0.841</div>
+        <div class="model-label">ROC-AUC</div>
     </div>
     """, unsafe_allow_html=True)
 
-
     st.markdown("""
-    <div style="height:30px"></div>
-
     <div style="
+        margin-top:22px;
+        padding:10px 4px;
         color:#64748B;
         font-size:10px;
         line-height:1.8;
-        letter-spacing:.5px;
     ">
-
-        DATA SCIENCE PORTFOLIO<br>
-        CUSTOMER RETENTION ANALYTICS
-
+        <b style="color:#CBD5E1;">Customer Churn Intelligence</b><br>
+        Data Science Portfolio Project<br><br>
+        EDA • Segmentation • XGBoost • SHAP
     </div>
     """, unsafe_allow_html=True)
 
+# ============================================================
+# HERO
+# ============================================================
 
-# =========================================================
-# PAGE HEADER
-# =========================================================
+st.markdown("""
+<div class="hero">
 
-page_meta = {
-
-    "Executive Overview": (
-        "CUSTOMER INTELLIGENCE",
-        "Customer Churn Intelligence",
-        "Retention command center for proactive customer management."
-    ),
-
-    "Risk Analytics": (
-        "RISK MANAGEMENT",
-        "Risk Analytics",
-        "Explore predicted churn probability, risk tiers and priority populations."
-    ),
-
-    "Customer Segments": (
-        "CUSTOMER STRATEGY",
-        "Customer Segmentation",
-        "Behavioral segments built from customer engagement and financial characteristics."
-    ),
-
-    "Churn Drivers": (
-        "MODEL EXPLAINABILITY",
-        "Churn Drivers",
-        "Understand which customer characteristics influence churn predictions."
-    ),
-
-    "Customer Explorer": (
-        "CUSTOMER 360",
-        "Customer Explorer",
-        "Inspect individual customer risk and recommended retention actions."
-    )
-}
-
-
-eyebrow, title, subtitle = page_meta[page]
-
-
-st.markdown(
-    f"""
-    <div class="product-header">
-
-        <div>
-
-            <div class="eyebrow">
-                {eyebrow}
-            </div>
-
-            <div class="main-title">
-                {title}
-            </div>
-
-            <div class="main-subtitle">
-                {subtitle}
-            </div>
-
-        </div>
-
-        <div class="status-pill">
-            ● MODEL ONLINE
-        </div>
-
+    <div class="hero-eyebrow">
+        CUSTOMER ANALYTICS PLATFORM
     </div>
-    """,
-    unsafe_allow_html=True
-)
 
+    <div class="hero-title">
+        Customer Churn Intelligence
+    </div>
 
-# =========================================================
+    <div class="hero-subtitle">
+        Retention command center for proactive customer management,
+        churn risk analysis and data-driven decision making.
+    </div>
+
+    <div class="status-pill">
+        ● MODEL ONLINE
+    </div>
+
+</div>
+""", unsafe_allow_html=True)
+
+# ============================================================
 # PAGE 1 — EXECUTIVE OVERVIEW
-# =========================================================
+# ============================================================
 
-if page == "Executive Overview":
+if st.session_state.page == "Executive Overview":
 
+    st.markdown(
+        '<div class="section-title">Executive Overview</div>',
+        unsafe_allow_html=True
+    )
 
-    # KPI CARDS
+    st.markdown(
+        '<div class="section-subtitle">'
+        'High-level view of customer retention and churn risk.'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    # KPI ROW
 
     k1, k2, k3, k4, k5 = st.columns(5)
 
-
     with k1:
-
-        st.markdown(
-            f"""
-            <div class="kpi-card">
-
-                <div class="kpi-top">
-
-                    <div class="kpi-label">
-                        TOTAL CUSTOMERS
-                    </div>
-
-                    <div class="kpi-icon">
-                        ◉
-                    </div>
-
-                </div>
-
-                <div class="kpi-value">
-                    {total_customers:,}
-                </div>
-
-                <div class="kpi-description">
-                    Active customer base
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
+        st.markdown(f"""
+        <div class="kpi-card">
+            <div class="kpi-label">Total Customers</div>
+            <div class="kpi-value">{total_customers:,}</div>
+            <div class="kpi-note">Active customer base</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with k2:
-
-        st.markdown(
-            f"""
-            <div class="kpi-card">
-
-                <div class="kpi-top">
-
-                    <div class="kpi-label">
-                        CHURN RATE
-                    </div>
-
-                    <div class="kpi-icon">
-                        %
-                    </div>
-
-                </div>
-
-                <div class="kpi-value">
-                    {churn_rate:.1%}
-                </div>
-
-                <div class="kpi-description">
-                    Historical churn
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
+        st.markdown(f"""
+        <div class="kpi-card">
+            <div class="kpi-label">Churn Rate</div>
+            <div class="kpi-value">{churn_rate:.1f}%</div>
+            <div class="kpi-note">Historical churn</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with k3:
-
-        st.markdown(
-            f"""
-            <div class="kpi-card">
-
-                <div class="kpi-top">
-
-                    <div class="kpi-label">
-                        AT-RISK CUSTOMERS
-                    </div>
-
-                    <div class="kpi-icon">
-                        !
-                    </div>
-
-                </div>
-
-                <div class="kpi-value">
-                    {at_risk:,}
-                </div>
-
-                <div class="kpi-description">
-                    Probability ≥ 35%
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
+        st.markdown(f"""
+        <div class="kpi-card">
+            <div class="kpi-label">At-Risk Customers</div>
+            <div class="kpi-value">{at_risk:,}</div>
+            <div class="kpi-note">Risk probability ≥ 35%</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with k4:
-
-        st.markdown(
-            f"""
-            <div class="kpi-card">
-
-                <div class="kpi-top">
-
-                    <div class="kpi-label">
-                        HIGH / CRITICAL
-                    </div>
-
-                    <div class="kpi-icon">
-                        ⚠
-                    </div>
-
-                </div>
-
-                <div class="kpi-value">
-                    {high_risk:,}
-                </div>
-
-                <div class="kpi-description">
-                    Priority customers
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
+        st.markdown(f"""
+        <div class="kpi-card">
+            <div class="kpi-label">High / Critical</div>
+            <div class="kpi-value">{high_critical:,}</div>
+            <div class="kpi-note">Priority customers</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with k5:
+        st.markdown(f"""
+        <div class="kpi-card">
+            <div class="kpi-label">Avg Model Risk</div>
+            <div class="kpi-value">{avg_model_risk:.1f}%</div>
+            <div class="kpi-note">Predicted probability</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-        st.markdown(
-            f"""
-            <div class="kpi-card">
-
-                <div class="kpi-top">
-
-                    <div class="kpi-label">
-                        AVG MODEL RISK
-                    </div>
-
-                    <div class="kpi-icon">
-                        ◇
-                    </div>
-
-                </div>
-
-                <div class="kpi-value">
-                    {avg_probability:.1%}
-                </div>
-
-                <div class="kpi-description">
-                    Predicted probability
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-
-    # RETENTION OVERVIEW
+    # --------------------------------------------------------
+    # CHARTS
+    # --------------------------------------------------------
 
     st.markdown(
         '<div class="section-title">Retention Risk Overview</div>',
         unsafe_allow_html=True
     )
 
-
-    st.markdown(
-        '<div class="section-subtitle">Portfolio-level view of customer risk and contract behavior.</div>',
-        unsafe_allow_html=True
-    )
-
-
     c1, c2 = st.columns(2)
-
-
-    # RISK DISTRIBUTION
 
     with c1:
 
-        risk_distribution = (
-            df["RiskLevel"]
+        risk_counts = (
+            df["RiskLevelFinal"]
             .value_counts()
             .reindex(
-                ["Critical", "High", "Medium", "Low"]
+                ["Critical", "High", "Medium", "Low"],
+                fill_value=0
             )
-            .fillna(0)
             .reset_index()
         )
 
-        risk_distribution.columns = [
-            "RiskLevel",
-            "Customers"
-        ]
-
+        risk_counts.columns = ["Risk Level", "Customers"]
 
         fig = px.bar(
-            risk_distribution,
-            x="RiskLevel",
+            risk_counts,
+            x="Risk Level",
             y="Customers",
             text="Customers",
             title="Customer Risk Distribution"
         )
 
-
         fig.update_traces(
             textposition="outside"
         )
 
-
         fig.update_layout(
-            template="plotly_white",
-            height=430,
-            margin=dict(
-                l=20,
-                r=20,
-                t=60,
-                b=20
-            ),
+            height=390,
+            margin=dict(l=20, r=20, t=55, b=20),
             plot_bgcolor="white",
-            paper_bgcolor="white"
+            paper_bgcolor="white",
+            showlegend=False
         )
-
 
         st.plotly_chart(
             fig,
             use_container_width=True
         )
-
-
-    # CONTRACT CHURN
 
     with c2:
 
-        contract_churn = (
-            df.groupby("Contract")["ChurnFlag"]
-            .mean()
-            .mul(100)
+        if contract_col and churn_col:
+
+            contract_churn = (
+                df.groupby(contract_col)["ChurnFlag"]
+                .mean()
+                .reset_index()
+            )
+
+            contract_churn["Churn Rate"] = (
+                contract_churn["ChurnFlag"] * 100
+            )
+
+            fig2 = px.bar(
+                contract_churn,
+                x=contract_col,
+                y="Churn Rate",
+                text="Churn Rate",
+                title="Churn Rate by Contract"
+            )
+
+            fig2.update_traces(
+                texttemplate="%{text:.1f}%",
+                textposition="outside"
+            )
+
+            fig2.update_layout(
+                height=390,
+                margin=dict(l=20, r=20, t=55, b=20),
+                plot_bgcolor="white",
+                paper_bgcolor="white",
+                showlegend=False
+            )
+
+            st.plotly_chart(
+                fig2,
+                use_container_width=True
+            )
+
+    # --------------------------------------------------------
+    # INSIGHT
+    # --------------------------------------------------------
+
+    st.markdown("""
+    <div class="insight-card">
+
+        <div class="insight-title">
+            ◆ Executive Insight
+        </div>
+
+        <div class="insight-text">
+            Customer churn analytics identifies high-risk customers,
+            reveals behavioral patterns and helps prioritize proactive
+            retention strategies. The dashboard combines descriptive
+            analytics, customer segmentation and machine-learning outputs
+            into one decision-support interface.
+        </div>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+# ============================================================
+# PAGE 2 — RISK ANALYTICS
+# ============================================================
+
+elif st.session_state.page == "Risk Analytics":
+
+    st.markdown(
+        '<div class="section-title">Risk Analytics</div>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        '<div class="section-subtitle">'
+        'Identify and prioritize customers requiring retention intervention.'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    # Risk filter
+
+    selected_risk = st.multiselect(
+        "Filter Risk Level",
+        ["Critical", "High", "Medium", "Low"],
+        default=["Critical", "High"]
+    )
+
+    risk_df = df[
+        df["RiskLevelFinal"].isin(selected_risk)
+    ]
+
+    st.metric(
+        "Customers in Selected Risk Groups",
+        f"{len(risk_df):,}"
+    )
+
+    # Risk distribution
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+
+        risk_counts = (
+            df["RiskLevelFinal"]
+            .value_counts()
             .reset_index()
         )
 
+        risk_counts.columns = ["Risk Level", "Customers"]
 
-        contract_churn.columns = [
-            "Contract",
-            "ChurnRate"
-        ]
-
-
-        fig = px.bar(
-            contract_churn,
-            x="Contract",
-            y="ChurnRate",
-            text="ChurnRate",
-            title="Churn Rate by Contract"
+        fig = px.pie(
+            risk_counts,
+            names="Risk Level",
+            values="Customers",
+            hole=0.55,
+            title="Overall Risk Distribution"
         )
-
-
-        fig.update_traces(
-            texttemplate="%{text:.1f}%",
-            textposition="outside"
-        )
-
 
         fig.update_layout(
-            template="plotly_white",
-            height=430,
-            margin=dict(
-                l=20,
-                r=20,
-                t=60,
-                b=20
-            ),
-            yaxis_title="Churn Rate (%)",
-            plot_bgcolor="white",
-            paper_bgcolor="white"
+            height=400,
+            margin=dict(t=60, l=10, r=10, b=10)
         )
-
 
         st.plotly_chart(
             fig,
             use_container_width=True
         )
 
+    with c2:
 
-    # EXECUTIVE INSIGHT
+        if contract_col:
 
-    st.markdown(
-        '<div class="section-title">Executive Insight</div>',
-        unsafe_allow_html=True
-    )
-
-
-    month_contract = df[
-        df["Contract"] == "Month-to-month"
-    ]["ChurnFlag"].mean()
-
-
-    st.markdown(
-        f"""
-        <div class="insight-card">
-
-            <div class="insight-title">
-                ✦ Executive Insight
-            </div>
-
-            <div class="insight-text">
-
-                Customers on month-to-month contracts show a
-                <b>{month_contract:.1%}</b> churn rate.
-
-                The ML system currently flags
-                <b>{at_risk:,}</b> customers above the
-                <b>35% intervention threshold</b> for proactive
-                retention attention.
-
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-# =========================================================
-# PAGE 2 — RISK ANALYTICS
-# =========================================================
-
-elif page == "Risk Analytics":
-
-
-    st.markdown(
-        '<div class="section-title">Risk Filters</div>',
-        unsafe_allow_html=True
-    )
-
-
-    f1, f2, f3 = st.columns(3)
-
-
-    with f1:
-
-        selected_risk = st.multiselect(
-            "Risk Level",
-            ["Critical", "High", "Medium", "Low"],
-            default=["Critical", "High"]
-        )
-
-
-    with f2:
-
-        selected_contract = st.multiselect(
-            "Contract",
-            sorted(
-                df["Contract"]
-                .dropna()
-                .unique()
-            ),
-            default=list(
-                df["Contract"]
-                .dropna()
-                .unique()
+            temp = (
+                risk_df.groupby(contract_col)
+                .size()
+                .reset_index(name="Customers")
             )
-        )
 
-
-    with f3:
-
-        min_probability = st.slider(
-            "Minimum Churn Probability",
-            0.0,
-            1.0,
-            0.35,
-            0.05
-        )
-
-
-    filtered = df[
-        (df["RiskLevel"].isin(selected_risk))
-        &
-        (df["Contract"].isin(selected_contract))
-        &
-        (df["ChurnProbability"] >= min_probability)
-    ]
-
-
-    st.markdown(
-        '<div class="section-title">Risk Population</div>',
-        unsafe_allow_html=True
-    )
-
-
-    c1, c2, c3 = st.columns(3)
-
-
-    c1.metric(
-        "Customers Matching Filters",
-        f"{len(filtered):,}"
-    )
-
-
-    c2.metric(
-        "Average Risk",
-        f"{filtered['ChurnProbability'].mean():.1%}"
-        if len(filtered)
-        else "0%"
-    )
-
-
-    c3.metric(
-        "Average Monthly Charges",
-        f"${filtered['MonthlyCharges'].mean():,.2f}"
-        if len(filtered)
-        else "$0"
-    )
-
-
-    # RISK MAP
-
-    fig = px.scatter(
-        filtered,
-        x="tenure",
-        y="ChurnProbability",
-        size="MonthlyCharges",
-        color="RiskLevel",
-        hover_data=[
-            "customerID",
-            "Contract",
-            "MonthlyCharges"
-        ],
-        title="Customer Risk Map",
-        labels={
-            "tenure": "Tenure (months)",
-            "ChurnProbability": "Churn Probability"
-        }
-    )
-
-
-    fig.update_layout(
-        template="plotly_white",
-        height=500
-    )
-
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
-
-
-    st.caption(
-        "Higher position indicates greater predicted churn probability. "
-        "Larger points represent higher monthly charges."
-    )
-
-
-# =========================================================
-# PAGE 3 — CUSTOMER SEGMENTS
-# =========================================================
-
-elif page == "Customer Segments":
-
-
-    # GUARANTEE SEGMENT COLUMN EXISTS
-
-    if "CustomerSegment" in df.columns:
-
-        mapping = {
-            0: "New / Low-Engagement",
-            1: "High-Value Loyal",
-            2: "Long-Term Low-Spend",
-            3: "High-Risk / At-Risk"
-        }
-
-        df["Segment Name"] = (
-            pd.to_numeric(
-                df["CustomerSegment"],
-                errors="coerce"
+            fig = px.bar(
+                temp,
+                x=contract_col,
+                y="Customers",
+                text="Customers",
+                title="High-Risk Customers by Contract"
             )
-            .map(mapping)
-            .fillna("Other")
-        )
 
-    else:
-
-        df["Segment Name"] = "Other"
-
-
-    # GROUPBY
-
-    segment_data = (
-        df.groupby(
-            "Segment Name",
-            dropna=False
-        )
-        .agg(
-            Customers=("customerID", "count"),
-            AvgTenure=("tenure", "mean"),
-            AvgMonthlyCharges=("MonthlyCharges", "mean"),
-            ChurnRate=("ChurnFlag", "mean")
-        )
-        .reset_index()
-    )
-
-
-    segment_data["ChurnRate"] *= 100
-
-
-    col1, col2 = st.columns(2)
-
-
-    # CUSTOMER DISTRIBUTION
-
-    with col1:
-
-        fig = px.bar(
-            segment_data,
-            x="Segment Name",
-            y="Customers",
-            text="Customers",
-            title="Customer Distribution by Segment"
-        )
-
-
-        fig.update_traces(
-            textposition="outside"
-        )
-
-
-        fig.update_layout(
-            template="plotly_white",
-            height=430,
-            xaxis_title=None
-        )
-
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
-
-
-    # CHURN RATE
-
-    with col2:
-
-        fig = px.bar(
-            segment_data,
-            x="Segment Name",
-            y="ChurnRate",
-            text="ChurnRate",
-            title="Churn Rate by Segment"
-        )
-
-
-        fig.update_traces(
-            texttemplate="%{text:.1f}%",
-            textposition="outside"
-        )
-
-
-        fig.update_layout(
-            template="plotly_white",
-            height=430,
-            xaxis_title=None,
-            yaxis_title="Churn Rate (%)"
-        )
-
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
-
-
-    # SEGMENT PROFILE
-
-    st.markdown(
-        '<div class="section-title">Segment Profile</div>',
-        unsafe_allow_html=True
-    )
-
-
-    st.dataframe(
-        segment_data.round(2),
-        use_container_width=True,
-        hide_index=True
-    )
-
-
-# =========================================================
-# PAGE 4 — CHURN DRIVERS
-# =========================================================
-
-elif page == "Churn Drivers":
-
-
-    st.markdown(
-        '<div class="section-title">What Drives Customer Churn?</div>',
-        unsafe_allow_html=True
-    )
-
-
-    st.markdown(
-        '<div class="section-subtitle">SHAP-based model explainability showing the strongest churn predictors.</div>',
-        unsafe_allow_html=True
-    )
-
-
-    try:
-
-        importance = pd.read_csv(
-            "shap_feature_importance.csv"
-        )
-
-
-        importance = importance.sort_values(
-            "MeanAbsSHAP",
-            ascending=True
-        )
-
-
-        top = importance.tail(15)
-
-
-        fig = px.bar(
-            top,
-            x="MeanAbsSHAP",
-            y="Feature",
-            orientation="h",
-            text="MeanAbsSHAP",
-            title="Top 15 Factors Influencing Customer Churn"
-        )
-
-
-        fig.update_traces(
-            texttemplate="%{text:.3f}",
-            textposition="outside"
-        )
-
-
-        fig.update_layout(
-            template="plotly_white",
-            height=650,
-            xaxis_title="Mean |SHAP Value|",
-            yaxis_title=None
-        )
-
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
-
-
-        st.info(
-            "Higher Mean |SHAP Value| indicates greater overall influence "
-            "on the model's churn predictions."
-        )
-
-
-        st.markdown(
-            '<div class="section-title">Feature Importance Table</div>',
-            unsafe_allow_html=True
-        )
-
-
-        st.dataframe(
-            importance
-            .sort_values(
-                "MeanAbsSHAP",
-                ascending=False
+            fig.update_traces(
+                textposition="outside"
             )
-            .head(15)
-            .round(4),
-            use_container_width=True,
-            hide_index=True
-        )
 
+            fig.update_layout(
+                height=400,
+                margin=dict(t=60, l=20, r=20, b=20)
+            )
 
-    except Exception:
+            st.plotly_chart(
+                fig,
+                use_container_width=True
+            )
 
-        st.error(
-            "SHAP feature importance data could not be loaded."
-        )
-
-
-# =========================================================
-# PAGE 5 — CUSTOMER EXPLORER
-# =========================================================
-
-elif page == "Customer Explorer":
-
-
-    if "risk_quick_filter" not in st.session_state:
-
-        st.session_state.risk_quick_filter = False
-
-
-    # QUICK FILTER
-
-    if st.session_state.risk_quick_filter:
-
-        explorer_df = df[
-            df["ChurnProbability"] >= 0.35
-        ].copy()
-
-        st.info(
-            f"Showing {len(explorer_df):,} customers above "
-            "the 35% retention threshold."
-        )
-
-
-        if st.button("← Show All Customers"):
-
-            st.session_state.risk_quick_filter = False
-
-            st.rerun()
-
-    else:
-
-        explorer_df = df.copy()
-
-
-    # CUSTOMER SELECTOR
-
-    customer_ids = sorted(
-        explorer_df["customerID"]
-        .dropna()
-        .unique()
-    )
-
-
-    if len(customer_ids) == 0:
-
-        st.warning(
-            "No customers match the current filter."
-        )
-
-        st.stop()
-
-
-    customer_id = st.selectbox(
-        "Select Customer",
-        customer_ids
-    )
-
-
-    customer = df[
-        df["customerID"] == customer_id
-    ].iloc[0]
-
-
-    probability = customer["ChurnProbability"]
-
-
-    if probability >= 0.70:
-
-        risk_class = "risk-critical"
-
-    elif probability >= 0.50:
-
-        risk_class = "risk-high"
-
-    elif probability >= 0.35:
-
-        risk_class = "risk-medium"
-
-    else:
-
-        risk_class = "risk-low"
-
-
-    # CUSTOMER RISK CARD
-
-    st.markdown(
-        f"""
-        <div class="{risk_class}">
-
-            <div class="profile-label">
-                CUSTOMER RISK PROFILE
-            </div>
-
-            <div class="profile-title">
-                {customer_id}
-            </div>
-
-            <br>
-
-            <b>Predicted Churn Probability:</b>
-            {probability:.1%}
-
-            &nbsp;&nbsp; | &nbsp;&nbsp;
-
-            <b>Risk Level:</b>
-            {customer["RiskLevel"]}
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-    # PROFILE
-
-    st.markdown(
-        '<div class="section-title">Customer Profile</div>',
-        unsafe_allow_html=True
-    )
-
-
-    c1, c2, c3, c4 = st.columns(4)
-
-
-    c1.metric(
-        "Tenure",
-        f"{customer['tenure']} months"
-    )
-
-
-    c2.metric(
-        "Monthly Charges",
-        f"${customer['MonthlyCharges']:.2f}"
-    )
-
-
-    c3.metric(
-        "Contract",
-        customer["Contract"]
-    )
-
-
-    c4.metric(
-        "Internet Service",
-        customer["InternetService"]
-    )
-
-
-    # RETENTION RECOMMENDATION
-
-    st.markdown(
-        '<div class="section-title">Retention Recommendation</div>',
-        unsafe_allow_html=True
-    )
-
-
-    st.success(
-        customer["RetentionRecommendation"]
-    )
-
-
-    # PRIORITY CUSTOMERS
+    # Customer table
 
     st.markdown(
         '<div class="section-title">Priority Customer List</div>',
         unsafe_allow_html=True
     )
 
+    display_cols = []
 
-    priority = df[
-        df["ChurnProbability"] >= 0.35
-    ].sort_values(
-        "ChurnProbability",
-        ascending=False
-    )
+    for col in [
+        customer_col,
+        contract_col,
+        tenure_col,
+        monthly_col,
+        total_col,
+        "RiskProbability",
+        "RiskLevelFinal"
+    ]:
 
-
-    columns = [
-        "customerID",
-        "Contract",
-        "tenure",
-        "MonthlyCharges",
-        "ChurnProbabilityPct",
-        "RiskLevel",
-        "RetentionRecommendation"
-    ]
-
-
-    available_columns = [
-        col
-        for col in columns
-        if col in priority.columns
-    ]
-
+        if col and col in df.columns:
+            display_cols.append(col)
 
     st.dataframe(
-        priority[available_columns].head(50),
+        risk_df[display_cols]
+        .sort_values(
+            "RiskProbability",
+            ascending=False
+        )
+        .head(100),
         use_container_width=True,
         hide_index=True
     )
 
+# ============================================================
+# PAGE 3 — CUSTOMER SEGMENTS
+# ============================================================
 
-    # EXPORT BUTTON
+elif st.session_state.page == "Customer Segments":
 
-    st.download_button(
-        "↓  Export Priority Customers",
-        data=priority[
-            available_columns
-        ].to_csv(index=False),
-        file_name="priority_customer_list.csv",
-        mime="text/csv"
+    st.markdown(
+        '<div class="section-title">Customer Segmentation</div>',
+        unsafe_allow_html=True
     )
 
+    st.markdown(
+        '<div class="section-subtitle">'
+        'K-Means customer groups based on behavioral and financial characteristics.'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
-# =========================================================
-# FOOTER
-# =========================================================
+    segment_summary = (
+        df.groupby("SegmentNameFinal")
+        .agg(
+            Customers=(df.columns[0], "size"),
+            AvgRisk=("RiskProbability", "mean")
+        )
+        .reset_index()
+    )
 
-st.markdown(
-    """
-    <div class="footer">
+    segment_summary["AvgRisk"] *= 100
 
-        CHURNIQ • CUSTOMER CHURN INTELLIGENCE
-        <br>
-        XGBoost • K-Means • SHAP • Streamlit
+    c1, c2 = st.columns(2)
+
+    with c1:
+
+        fig = px.bar(
+            segment_summary,
+            x="SegmentNameFinal",
+            y="Customers",
+            text="Customers",
+            title="Customers by Segment"
+        )
+
+        fig.update_traces(
+            textposition="outside"
+        )
+
+        fig.update_layout(
+            height=430,
+            xaxis_title="Segment",
+            yaxis_title="Customers"
+        )
+
+        st.plotly_chart(
+            fig,
+            use_container_width=True
+        )
+
+    with c2:
+
+        fig = px.bar(
+            segment_summary,
+            x="SegmentNameFinal",
+            y="AvgRisk",
+            text="AvgRisk",
+            title="Average Risk by Segment"
+        )
+
+        fig.update_traces(
+            texttemplate="%{text:.1f}%",
+            textposition="outside"
+        )
+
+        fig.update_layout(
+            height=430,
+            xaxis_title="Segment",
+            yaxis_title="Average Risk (%)"
+        )
+
+        st.plotly_chart(
+            fig,
+            use_container_width=True
+        )
+
+    # Segment profile
+
+    st.markdown(
+        '<div class="section-title">Segment Profile</div>',
+        unsafe_allow_html=True
+    )
+
+    profile_cols = []
+
+    for col in [
+        tenure_col,
+        monthly_col,
+        total_col,
+        "RiskProbability"
+    ]:
+
+        if col:
+            profile_cols.append(col)
+
+    if profile_cols:
+
+        profile = (
+            df.groupby("SegmentNameFinal")[profile_cols]
+            .mean()
+            .reset_index()
+        )
+
+        if "RiskProbability" in profile.columns:
+            profile["RiskProbability"] *= 100
+
+        st.dataframe(
+            profile.round(2),
+            use_container_width=True,
+            hide_index=True
+        )
+
+# ============================================================
+# PAGE 4 — CHURN DRIVERS
+# ============================================================
+
+elif st.session_state.page == "Churn Drivers":
+
+    st.markdown(
+        '<div class="section-title">Churn Drivers</div>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        '<div class="section-subtitle">'
+        'Key characteristics identified by the churn analysis and model.'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    # Your SHAP results from the analysis
+    shap_features = pd.DataFrame({
+        "Feature": [
+            "Two-year Contract",
+            "Tenure",
+            "Support Risk",
+            "One-year Contract",
+            "Fiber Optic Internet",
+            "Average Monthly Spend",
+            "Total Charges",
+            "Electronic Check",
+            "Monthly Charges",
+            "Paperless Billing",
+            "Multiple Lines",
+            "Online Backup",
+            "Streaming Movies",
+            "Phone Service",
+            "Streaming TV"
+        ],
+        "Importance": [
+            0.520533,
+            0.484566,
+            0.395179,
+            0.239302,
+            0.231344,
+            0.202580,
+            0.192231,
+            0.179241,
+            0.176551,
+            0.149952,
+            0.102514,
+            0.075721,
+            0.063462,
+            0.056377,
+            0.055720
+        ]
+    })
+
+    fig = px.bar(
+        shap_features.head(10).sort_values("Importance"),
+        x="Importance",
+        y="Feature",
+        orientation="h",
+        text="Importance",
+        title="Top Churn Drivers — SHAP Feature Importance"
+    )
+
+    fig.update_traces(
+        texttemplate="%{text:.2f}",
+        textposition="outside"
+    )
+
+    fig.update_layout(
+        height=550,
+        margin=dict(l=20, r=60, t=60, b=20),
+        plot_bgcolor="white",
+        paper_bgcolor="white"
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
+
+    # Key findings
+
+    st.markdown("""
+    <div class="insight-card">
+
+        <div class="insight-title">
+            ◆ Key Findings
+        </div>
+
+        <div class="insight-text">
+
+            <b>Contract type</b> is one of the strongest predictors
+            of customer churn.<br><br>
+
+            <b>Tenure</b> has a major relationship with retention,
+            with newer customers generally requiring more attention.<br><br>
+
+            <b>Support risk</b> is another important indicator of
+            potential churn behavior.<br><br>
+
+            <b>Fiber optic service, monthly spending and total charges</b>
+            also contribute significantly to the model's churn predictions.
+
+        </div>
 
     </div>
-    """,
-    unsafe_allow_html=True
-)
+    """, unsafe_allow_html=True)
+
+# ============================================================
+# PAGE 5 — CUSTOMER EXPLORER
+# ============================================================
+
+elif st.session_state.page == "Customer Explorer":
+
+    st.markdown(
+        '<div class="section-title">Customer Explorer</div>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        '<div class="section-subtitle">'
+        'Search and inspect an individual customer profile.'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    if customer_col:
+
+        # ----------------------------------------------------
+        # SEARCHABLE CUSTOMER DROPDOWN
+        # ----------------------------------------------------
+
+        customer_ids = (
+            df[customer_col]
+            .dropna()
+            .astype(str)
+            .sort_values()
+            .unique()
+            .tolist()
+        )
+
+        selected_customer = st.selectbox(
+            "Search Customer ID",
+            customer_ids,
+            index=0,
+            placeholder="Type to search customer..."
+        )
+
+        customer = df[
+            df[customer_col].astype(str) == str(selected_customer)
+        ]
+
+        if len(customer) > 0:
+
+            row = customer.iloc[0]
+
+            risk = str(
+                row.get(
+                    "RiskLevelFinal",
+                    "Unknown"
+                )
+            )
+
+            # Risk badge
+
+            risk_class = {
+                "Critical": "risk-critical",
+                "High": "risk-high",
+                "Medium": "risk-medium",
+                "Low": "risk-low"
+            }.get(
+                risk,
+                "risk-low"
+            )
+
+            st.markdown(f"""
+            <div class="profile-card">
+
+                <div class="profile-title">
+                    Customer {selected_customer}
+                </div>
+
+                <div class="profile-subtitle">
+                    Individual customer risk profile
+                </div>
+
+                <div style="margin-top:15px;">
+                    <span class="{risk_class}">
+                        {risk} Risk
+                    </span>
+                </div>
+
+            </div>
+            """, unsafe_allow_html=True)
+
+            # ------------------------------------------------
+            # CUSTOMER PROFILE TABLE
+            # ------------------------------------------------
+
+            st.markdown(
+                '<div class="section-title">Customer Profile</div>',
+                unsafe_allow_html=True
+            )
+
+            profile_data = {}
+
+            for label, col in [
+                ("Customer ID", customer_col),
+                ("Contract", contract_col),
+                ("Tenure", tenure_col),
+                ("Monthly Charges", monthly_col),
+                ("Total Charges", total_col),
+                ("Churn", churn_col),
+                ("Customer Segment", "SegmentNameFinal"),
+                ("Risk Level", "RiskLevelFinal")
+            ]:
+
+                if col and col in row.index:
+
+                    value = row[col]
+
+                    if pd.isna(value):
+                        value = "N/A"
+
+                    profile_data[label] = value
+
+            profile_table = pd.DataFrame(
+                list(profile_data.items()),
+                columns=["Attribute", "Value"]
+            )
+
+            st.dataframe(
+                profile_table,
+                use_container_width=True,
+                hide_index=True
+            )
+
+            # ------------------------------------------------
+            # METRICS
+            # ------------------------------------------------
+
+            st.markdown(
+                '<div class="section-title">Customer Metrics</div>',
+                unsafe_allow_html=True
+            )
+
+            m1, m2, m3, m4 = st.columns(4)
+
+            with m1:
+
+                value = row[tenure_col] if tenure_col else 0
+
+                st.metric(
+                    "Tenure",
+                    f"{value:.0f} months"
+                    if isinstance(value, (int, float, np.number))
+                    else str(value)
+                )
+
+            with m2:
+
+                value = row[monthly_col] if monthly_col else 0
+
+                st.metric(
+                    "Monthly Charges",
+                    f"${float(value):,.2f}"
+                    if pd.notna(value)
+                    else "N/A"
+                )
+
+            with m3:
+
+                value = row[total_col] if total_col else 0
+
+                st.metric(
+                    "Total Charges",
+                    f"${float(value):,.2f}"
+                    if pd.notna(value)
+                    else "N/A"
+                )
+
+            with m4:
+
+                churn_value = row[churn_col] if churn_col else "N/A"
+
+                st.metric(
+                    "Churn",
+                    str(churn_value)
+                )
+
+            # ------------------------------------------------
+            # CUSTOMER RISK
+            # ------------------------------------------------
+
+            st.markdown(
+                '<div class="section-title">Risk Assessment</div>',
+                unsafe_allow_html=True
+            )
+
+            probability = row.get(
+                "RiskProbability",
+                0
+            )
+
+            probability = float(probability)
+
+            st.progress(
+                min(max(probability, 0), 1)
+            )
+
+            st.write(
+                f"Estimated churn risk: **{probability * 100:.1f}%**"
+            )
+
+    else:
+
+        st.warning(
+            "Customer ID column was not found in the dataset."
+        )
+
+# ============================================================
+# FOOTER
+# ============================================================
+
+st.markdown("""
+<div class="footer">
+    Customer Churn Intelligence &nbsp; • &nbsp;
+    Data Science Portfolio Project &nbsp; • &nbsp;
+    EDA + Segmentation + XGBoost + SHAP
+</div>
+""", unsafe_allow_html=True)
