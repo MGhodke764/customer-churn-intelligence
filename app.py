@@ -608,11 +608,11 @@ with st.sidebar:
     )
 
     nav_items = [
-        ("Executive Overview", "▦"),
+        ("Executive Overview", "◉"),
         ("Risk Analytics", "◉"),
-        ("Customer Segments", "◌"),
-        ("Churn Drivers", "✦"),
-        ("Customer Explorer", "⌕")
+        ("Customer Segments", "◉"),
+        ("Churn Drivers", "◉"),
+        ("Customer Explorer", "◉")
     ]
 
     if "page" not in st.session_state:
