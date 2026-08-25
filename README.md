@@ -1,7 +1,7 @@
 # customer-churn-intelligence
 AI-powered customer churn prediction, segmentation and retention analytics
 CHURNIQ – Customer Churn Intelligence Platform
-📌 Overview
+###📌 Overview
 CHURNIQ is an interactive customer churn intelligence platform designed to help businesses identify customers who are likely to churn and take proactive retention actions.
 
 The platform combines Machine Learning, Customer Segmentation, Model Explainability, and Data Visualization into a single Streamlit dashboard.
