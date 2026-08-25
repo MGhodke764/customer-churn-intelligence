@@ -1,57 +1,33 @@
-# customer-churn-intelligence
-AI-powered customer churn prediction, segmentation and retention analytics
-CHURNIQ – Customer Churn Intelligence Platform
-### 📌 Overview
-CHURNIQ is an interactive customer churn intelligence platform designed to help businesses identify customers who are likely to churn and take proactive retention actions.
+# CHURNIQ — Customer Churn Intelligence
+### Overview
+CHURNIQ is a customer churn intelligence and retention analytics application built with Python, Streamlit, XGBoost, K-Means, SHAP, Pandas, and Plotly.
 
-The platform combines Machine Learning, Customer Segmentation, Model Explainability, and Data Visualization into a single Streamlit dashboard.
+The application analyzes customer behavior and churn probability to help identify customers who are at risk of leaving and support proactive retention decisions.
 
-It provides insights at both the business level and individual customer level, helping identify high-risk customers, understand churn drivers, and prioritize retention efforts.
+## Key Features
+### Executive Overview
 
-🎯 Objectives
-Predict the probability of customer churn.
-
-Identify high-risk and at-risk customers.
-
-Segment customers based on behavioral characteristics.
-
-Understand the factors influencing churn predictions.
-
-Provide actionable customer retention recommendations.
-
-Build an interactive dashboard for business decision-making.
-
-🚀 Key Features
-📊 Executive Overview
-Total customer count
+Total customers
 
 Overall churn rate
 
-At-risk customer count
+At-risk customers
 
-High/Critical risk customers
+High/Critical-risk customers
 
-Average model risk
+Average predicted churn probability
 
-Customer risk distribution
+### Risk Analytics
 
-Churn rate by contract type
+Filter customers by risk level
 
-Executive-level retention insights
+Filter by contract type
 
-⚠️ Risk Analytics
-Filter customers by risk level.
+Set minimum churn probability
 
-Filter by contract type.
+Analyze customer risk based on tenure and monthly charges
 
-Set a minimum churn probability.
-
-Interactive customer risk map.
-
-Analyze tenure, monthly charges, and churn probability.
-
-👥 Customer Segmentation
-Customers are grouped into behavioral segments:
+### Customer Segmentation
 
 New / Low-Engagement
 
@@ -61,45 +37,38 @@ Long-Term Low-Spend
 
 High-Risk / At-Risk
 
-The dashboard compares customer distribution, average tenure, monthly charges, and churn rate across segments.
+Segment-level customer and churn analysis
 
-🔍 Churn Drivers
-Uses SHAP (SHapley Additive exPlanations) to visualize the most influential factors affecting churn predictions.
+### Churn Drivers
 
-The dashboard provides:
+SHAP-based model explainability
 
-Top 15 churn-influencing features
+Identifies the strongest factors influencing churn predictions
 
-SHAP feature importance visualization
+Feature importance analysis
 
-Feature importance table
+### Customer Explorer
 
-👤 Customer Explorer
-Allows users to select a specific customer ID and view:
+Select customers using Customer ID
 
-Predicted churn probability
+View individual churn probability
 
-Risk level
+View risk level
 
-Customer tenure
+View tenure, contract, monthly charges, and internet service
 
-Monthly charges
+Receive retention recommendations
 
-Contract type
+View priority customers
 
-Internet service
+Export priority customer data as CSV
 
-Retention recommendation
+### Machine Learning
+The project uses an XGBoost Classifier to predict customer churn probability.
 
-Priority customer list
+Model information displayed in the application:
 
-High-risk customers can also be filtered directly through the Quick Actions section.
-
-🤖 Machine Learning
-The project uses an XGBoost Classifier for customer churn prediction.
-
-Model Information
-Algorithm: XGBoost Classifier
+Model: XGBoost Classifier
 
 ROC-AUC: 0.841
 
@@ -107,15 +76,93 @@ Intervention Threshold: 35%
 
 Explainability: SHAP
 
-Customers with a predicted churn probability of 35% or higher are treated as an intervention/at-risk population.
+Customers with a predicted churn probability of 35% or higher are considered part of the at-risk population.
 
-👥 Customer Segmentation
-K-Means clustering is used to identify customer groups based on customer characteristics.
+### Customer Risk Classification
+Churn Probability	Risk Classification
+< 35%	Low
+35% – 49%	Medium
+50% – 69%	High
+≥ 70%	Critical
 
-The resulting segments help distinguish different customer behaviors and enable more targeted retention strategies.
+### Technology Stack
+Python
+  |
+Pandas
+  |
+Streamlit
+  |
+Plotly
+  |
+XGBoost
+  |
+SHAP
+  |
+K-Means
+  |
+HTML/CSS
+  |
+GitHub
+  
+### Project Files
 
-🧠 Model Explainability
-SHAP is used to understand how individual features contribute to the model's churn predictions.
+customer-churn-project/
+│
+├── app.py
+├── telco_churn_powerbi.csv
+├── shap_feature_importance.csv
+├── requirements.txt
+└── README.md
 
-This makes the ML model more interpretable and helps translate model results into business insights.
+
+### Dataset
+The application uses:
+
+
+telco_churn_powerbi.csv
+The dataset contains customer information, churn status, churn probability, risk level, contract information, tenure, monthly charges, customer segments, and retention recommendations.
+
+### SHAP Feature Importance
+The application reads:
+
+
+shap_feature_importance.csv
+This file contains:
+
+Feature
+
+MeanAbsSHAP
+
+These values are used to explain the relative importance of features in the churn prediction model.
+
+### Running the Application
+Install the required dependencies:
+
+Bash
+
+pip install -r requirements.txt
+Run the Streamlit application:
+
+Bash
+
+streamlit run app.py
+The application can also be deployed directly through GitHub + Streamlit Community Cloud, with app.py, requirements.txt, and the required CSV files stored in the same repository.
+
+### Business Objective
+The primary objective of CHURNIQ is to transform customer data into actionable retention insights by:
+
+1.Identifying customers likely to churn.
+
+2.Categorizing customers according to risk.
+
+3.Understanding the factors influencing churn.
+
+4.Identifying important customer segments.
+
+5.Prioritizing high-risk customers.
+
+6.Supporting targeted retention strategies.
+
+## Author
+### Mayuri Ghodke
 
