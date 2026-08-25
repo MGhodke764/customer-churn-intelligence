@@ -107,11 +107,21 @@ GitHub
 ### Project Files
 
 customer-churn-project/
+
+
 │
 ├── app.py
+
+
 ├── telco_churn_powerbi.csv
+
+
 ├── shap_feature_importance.csv
+
+
 ├── requirements.txt
+
+
 └── README.md
 
 
