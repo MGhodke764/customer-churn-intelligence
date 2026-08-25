@@ -1,531 +1,523 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
+import textwrap
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
 
 
-# =========================================================
+# ============================================================
 # PAGE CONFIG
-# =========================================================
+# ============================================================
 
 st.set_page_config(
-    page_title="ChurnIQ | Customer Intelligence",
-    page_icon="◈",
+    page_title="Customer Intelligence",
+    page_icon="◆",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 
-# =========================================================
-# PROFESSIONAL CSS
-# =========================================================
-
-st.markdown("""
-<style>
-
-.stApp {
-    background: #F6F8FC;
-    color: #0F172A;
-}
-
-.block-container {
-    padding-top: 5rem !important;
-    padding-bottom: 3rem !important;
-    max-width: 1500px;
-}
-
-#MainMenu,
-footer,
-[data-testid="stDecoration"] {
-    visibility: hidden;
-}
-
-
-/* =========================================================
-   SIDEBAR
-   ========================================================= */
-
-section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0A1020 0%, #111827 100%);
-    border-right: 1px solid #1E293B;
-}
-
-section[data-testid="stSidebar"] > div {
-    padding-top: 1rem;
-}
-
-section[data-testid="stSidebar"] * {
-    color: #E5E7EB;
-}
-
-.brand {
-    padding: 8px 5px 25px;
-}
-
-.brand-mark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 11px;
-    background: linear-gradient(135deg, #2563EB, #60A5FA);
-    color: white !important;
-    font-size: 18px;
-    font-weight: 900;
-    margin-right: 9px;
-}
-
-.brand-name {
-    color: white !important;
-    font-size: 21px;
-    font-weight: 850;
-    letter-spacing: -0.6px;
-}
-
-.brand-sub {
-    color: #94A3B8 !important;
-    font-size: 11px;
-    margin-top: 8px;
-}
-
-.nav-label {
-    color: #64748B !important;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1.4px;
-    text-transform: uppercase;
-    margin: 14px 0 8px 3px;
-}
-
-
-/* SIDEBAR BUTTONS */
-
-section[data-testid="stSidebar"] .stButton > button {
-    width: 100%;
-    min-height: 43px;
-    text-align: left;
-    border: 1px solid transparent;
-    border-radius: 10px;
-    background: transparent !important;
-    color: #CBD5E1 !important;
-    font-weight: 600;
-    font-size: 13px;
-    padding: 0.55rem 0.8rem;
-    margin: 2px 0;
-    transition: all .2s ease;
-}
-
-section[data-testid="stSidebar"] .stButton > button:hover {
-    background: #1B2638 !important;
-    border-color: #334155 !important;
-    color: #FFFFFF !important;
-    transform: translateX(2px);
-}
-
-section[data-testid="stSidebar"] .stButton > button p {
-    color: inherit !important;
-}
-
-
-/* QUICK ACTION BUTTONS */
-
-section[data-testid="stSidebar"] .stButton:nth-of-type(6) > button {
-    color: #FCA5A5 !important;
-}
-
-section[data-testid="stSidebar"] .stButton:nth-of-type(6) > button:hover {
-    background: #3B1720 !important;
-    color: #FECACA !important;
-}
-
-section[data-testid="stSidebar"] .stButton:nth-of-type(7) > button {
-    color: #93C5FD !important;
-}
-
-section[data-testid="stSidebar"] .stButton:nth-of-type(7) > button:hover {
-    background: #172554 !important;
-    color: #BFDBFE !important;
-}
-
-
-.side-card {
-    margin-top: 20px;
-    padding: 15px;
-    border: 1px solid #263449;
-    background: rgba(255,255,255,.035);
-    border-radius: 13px;
-}
-
-.side-card-title {
-    color: #94A3B8 !important;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 800;
-}
-
-.side-model {
-    color: white !important;
-    font-size: 14px;
-    font-weight: 700;
-    margin-top: 8px;
-}
-
-.side-row {
-    display: flex;
-    justify-content: space-between;
-    padding-top: 10px;
-    font-size: 11px;
-    color: #94A3B8 !important;
-}
-
-.side-row b {
-    color: #E2E8F0 !important;
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.product-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 10px 0 23px;
-    border-bottom: 1px solid #E2E8F0;
-    margin-bottom: 26px;
-}
-
-.eyebrow {
-    color: #2563EB !important;
-    font-size: 10px;
-    font-weight: 850;
-    text-transform: uppercase;
-    letter-spacing: 1.7px;
-    margin-bottom: 9px;
-}
-
-.main-title {
-    color: #0F172A !important;
-    font-size: 35px;
-    line-height: 1.05;
-    font-weight: 850;
-    letter-spacing: -1.4px;
-    margin: 0;
-}
-
-.main-subtitle {
-    color: #64748B !important;
-    font-size: 13px;
-    margin-top: 9px;
-}
-
-.status-pill {
-    background: #ECFDF5;
-    border: 1px solid #A7F3D0;
-    color: #047857 !important;
-    border-radius: 999px;
-    padding: 8px 13px;
-    font-size: 11px;
-    font-weight: 800;
-    white-space: nowrap;
-}
-
-
-/* =========================================================
-   KPI
-   ========================================================= */
-
-.kpi-card {
-    background: white;
-    border: 1px solid #E2E8F0;
-    border-radius: 15px;
-    padding: 19px;
-    min-height: 132px;
-    box-shadow: 0 5px 18px rgba(15,23,42,.04);
-    transition: all .2s ease;
-}
-
-.kpi-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 9px 25px rgba(15,23,42,.08);
-}
-
-.kpi-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.kpi-label {
-    color: #64748B !important;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: .9px;
-}
-
-.kpi-icon {
-    width: 31px;
-    height: 31px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #EFF6FF;
-    color: #2563EB !important;
-    border-radius: 9px;
-    font-weight: 800;
-}
-
-.kpi-value {
-    color: #0F172A !important;
-    font-size: 28px;
-    font-weight: 850;
-    letter-spacing: -.8px;
-    margin-top: 13px;
-}
-
-.kpi-description {
-    color: #94A3B8 !important;
-    font-size: 10px;
-    margin-top: 4px;
-}
-
-
-/* =========================================================
-   SECTIONS
-   ========================================================= */
-
-.section-title {
-    font-size: 19px;
-    font-weight: 850;
-    color: #0F172A !important;
-    letter-spacing: -.35px;
-    margin-top: 30px;
-    margin-bottom: 13px;
-}
-
-.section-subtitle {
-    color: #64748B !important;
-    font-size: 12px;
-    margin-top: -7px;
-    margin-bottom: 16px;
-}
-
-
-/* =========================================================
-   INSIGHT
-   ========================================================= */
-
-.insight-card {
-    background: linear-gradient(
-        135deg,
-        #EFF6FF 0%,
-        #F8FAFC 100%
-    );
-    border: 1px solid #BFDBFE;
-    border-radius: 15px;
-    padding: 18px 20px;
-}
-
-.insight-title {
-    color: #1D4ED8 !important;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 850;
-}
-
-.insight-text {
-    color: #1E3A8A !important;
-    font-size: 13px;
-    line-height: 1.6;
-    margin-top: 7px;
-}
-
-
-/* =========================================================
-   RISK CARDS
-   ========================================================= */
-
-.risk-critical,
-.risk-high,
-.risk-medium,
-.risk-low {
-    border-radius: 14px;
-    padding: 18px;
-    border: 1px solid;
-}
-
-.risk-critical {
-    background: #FEF2F2;
-    border-color: #FECACA;
-    color: #991B1B;
-}
-
-.risk-high {
-    background: #FFF7ED;
-    border-color: #FED7AA;
-    color: #9A3412;
-}
-
-.risk-medium {
-    background: #FFFBEB;
-    border-color: #FDE68A;
-    color: #92400E;
-}
-
-.risk-low {
-    background: #F0FDF4;
-    border-color: #BBF7D0;
-    color: #166534;
-}
-
-
-/* =========================================================
-   PROFILE
-   ========================================================= */
-
-.profile-label {
-    font-size: 10px;
-    color: #64748B !important;
-    text-transform: uppercase;
-    letter-spacing: .9px;
-    font-weight: 800;
-}
-
-.profile-title {
-    font-size: 24px;
-    font-weight: 850;
-    color: #0F172A !important;
-    margin-top: 6px;
-}
-
-
-/* IMPORTANT:
-   These classes are spans/divs, so HTML will render normally.
-*/
-
-.risk-badge-critical {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 6px 11px;
-    border-radius: 999px;
-    background: #FEE2E2;
-    color: #B91C1C !important;
-    border: 1px solid #FECACA;
-    font-size: 12px;
-    font-weight: 800;
-}
-
-.risk-badge-high {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 6px 11px;
-    border-radius: 999px;
-    background: #FFEDD5;
-    color: #C2410C !important;
-    border: 1px solid #FED7AA;
-    font-size: 12px;
-    font-weight: 800;
-}
-
-.risk-badge-medium {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 6px 11px;
-    border-radius: 999px;
-    background: #FEF3C7;
-    color: #A16207 !important;
-    border: 1px solid #FDE68A;
-    font-size: 12px;
-    font-weight: 800;
-}
-
-.risk-badge-low {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 6px 11px;
-    border-radius: 999px;
-    background: #DCFCE7;
-    color: #15803D !important;
-    border: 1px solid #BBF7D0;
-    font-size: 12px;
-    font-weight: 800;
-}
-
-
-/* =========================================================
-   MODEL / RETENTION TEXT
-   ========================================================= */
-
-.model-text {
-    color: #374151 !important;
-    font-size: 13px;
-    line-height: 1.7;
-    margin-top: 8px;
-}
-
-
-/* =========================================================
-   BUTTONS
-   ========================================================= */
-
-.stButton > button {
-    border-radius: 9px;
-    font-weight: 700;
-}
-
-.stDownloadButton > button {
-    border-radius: 9px;
-    font-weight: 700;
-}
-
-
-/* =========================================================
-   INPUTS
-   ========================================================= */
-
-div[data-baseweb="select"] > div {
-    border-radius: 9px;
-}
-
-input {
-    border-radius: 9px !important;
-}
-
-
-/* =========================================================
-   TABLE
-   ========================================================= */
-
-[data-testid="stDataFrame"] {
-    border: 1px solid #E2E8F0;
-    border-radius: 12px;
-}
-
-
-/* =========================================================
-   FOOTER
-   ========================================================= */
-
-.footer {
-    border-top: 1px solid #E2E8F0;
-    margin-top: 40px;
-    padding-top: 17px;
-    text-align: center;
-    color: #94A3B8 !important;
-    font-size: 10px;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-
-# =========================================================
+# ============================================================
+# CUSTOM CSS
+# ============================================================
+
+st.markdown(
+    textwrap.dedent("""
+    <style>
+
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
+    }
+
+    .stApp {
+        background: #F5F7FB;
+        color: #0F172A;
+    }
+
+    .block-container {
+        max-width: 1500px;
+        padding-top: 2.5rem !important;
+        padding-bottom: 3rem !important;
+        padding-left: 2.5rem !important;
+        padding-right: 2.5rem !important;
+    }
+
+    #MainMenu,
+    footer,
+    [data-testid="stDecoration"] {
+        visibility: hidden;
+    }
+
+
+    /* ========================================================
+       SIDEBAR
+       ======================================================== */
+
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(
+            180deg,
+            #08111F 0%,
+            #0F172A 55%,
+            #111827 100%
+        );
+        border-right: 1px solid #1E293B;
+    }
+
+    section[data-testid="stSidebar"] > div {
+        padding-top: 1rem;
+    }
+
+    section[data-testid="stSidebar"] * {
+        color: #E5E7EB;
+    }
+
+    .brand {
+        padding: 10px 6px 25px 6px;
+    }
+
+    .brand-mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        background: linear-gradient(
+            135deg,
+            #2563EB,
+            #60A5FA
+        );
+        color: white;
+        font-size: 19px;
+        font-weight: 900;
+        margin-right: 9px;
+        vertical-align: middle;
+    }
+
+    .brand-name {
+        color: #FFFFFF;
+        font-size: 21px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        vertical-align: middle;
+    }
+
+    .brand-sub {
+        color: #94A3B8;
+        font-size: 11px;
+        margin-top: 9px;
+        padding-left: 2px;
+    }
+
+    .nav-label {
+        color: #64748B;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin: 15px 0 8px 4px;
+    }
+
+    section[data-testid="stSidebar"] .stButton {
+        margin-bottom: 4px;
+    }
+
+    section[data-testid="stSidebar"] .stButton > button {
+        width: 100%;
+        min-height: 43px;
+        text-align: left;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        background: transparent;
+        color: #CBD5E1;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 0.55rem 0.8rem;
+        transition: all 0.2s ease;
+    }
+
+    section[data-testid="stSidebar"] .stButton > button:hover {
+        background: #1B2638;
+        border-color: #334155;
+        color: #FFFFFF;
+        transform: translateX(2px);
+    }
+
+    section[data-testid="stSidebar"] .stButton > button:focus {
+        border-color: #2563EB;
+        color: #FFFFFF;
+        box-shadow: none;
+    }
+
+    .side-card {
+        margin-top: 22px;
+        padding: 16px;
+        border: 1px solid #263449;
+        background: rgba(255,255,255,0.035);
+        border-radius: 13px;
+    }
+
+    .side-card-title {
+        color: #94A3B8;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 800;
+    }
+
+    .side-model {
+        color: #FFFFFF;
+        font-size: 14px;
+        font-weight: 700;
+        margin-top: 9px;
+    }
+
+    .side-row {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 10px;
+        font-size: 11px;
+        color: #94A3B8;
+    }
+
+    .side-row b {
+        color: #E2E8F0;
+    }
+
+
+    /* ========================================================
+       HEADER
+       ======================================================== */
+
+    .product-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 8px 0 22px 0;
+        border-bottom: 1px solid #E2E8F0;
+        margin-bottom: 26px;
+    }
+
+    .eyebrow {
+        color: #2563EB;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.7px;
+        margin-bottom: 9px;
+    }
+
+    .main-title {
+        color: #0F172A;
+        font-size: 35px;
+        line-height: 1.05;
+        font-weight: 800;
+        letter-spacing: -1.3px;
+        margin: 0;
+    }
+
+    .main-subtitle {
+        color: #64748B;
+        font-size: 13px;
+        margin-top: 9px;
+    }
+
+    .status-pill {
+        background: #ECFDF5;
+        border: 1px solid #A7F3D0;
+        color: #047857;
+        border-radius: 999px;
+        padding: 8px 13px;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+
+    /* ========================================================
+       KPI
+       ======================================================== */
+
+    .kpi-card {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 15px;
+        padding: 19px;
+        min-height: 132px;
+        box-shadow: 0 5px 18px rgba(15,23,42,0.04);
+        transition: all 0.2s ease;
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 9px 25px rgba(15,23,42,0.08);
+    }
+
+    .kpi-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .kpi-label {
+        color: #64748B;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.9px;
+    }
+
+    .kpi-icon {
+        width: 31px;
+        height: 31px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #EFF6FF;
+        color: #2563EB;
+        border-radius: 9px;
+        font-weight: 800;
+    }
+
+    .kpi-value {
+        color: #0F172A;
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.8px;
+        margin-top: 13px;
+    }
+
+    .kpi-description {
+        color: #94A3B8;
+        font-size: 10px;
+        margin-top: 4px;
+    }
+
+
+    /* ========================================================
+       SECTION
+       ======================================================== */
+
+    .section-title {
+        font-size: 19px;
+        font-weight: 800;
+        color: #0F172A;
+        letter-spacing: -0.35px;
+        margin-top: 30px;
+        margin-bottom: 13px;
+    }
+
+    .section-subtitle {
+        color: #64748B;
+        font-size: 12px;
+        margin-top: -7px;
+        margin-bottom: 16px;
+    }
+
+
+    /* ========================================================
+       INSIGHT
+       ======================================================== */
+
+    .insight-card {
+        background: linear-gradient(
+            135deg,
+            #EFF6FF 0%,
+            #F8FAFC 100%
+        );
+        border: 1px solid #BFDBFE;
+        border-radius: 15px;
+        padding: 18px 20px;
+        margin-top: 5px;
+    }
+
+    .insight-title {
+        color: #1D4ED8;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 800;
+    }
+
+    .insight-text {
+        color: #1E3A8A;
+        font-size: 13px;
+        line-height: 1.6;
+        margin-top: 7px;
+    }
+
+    .model-text {
+        color: #334155;
+        font-size: 13px;
+        line-height: 1.65;
+        margin-top: 8px;
+    }
+
+
+    /* ========================================================
+       RISK CARDS
+       ======================================================== */
+
+    .risk-critical,
+    .risk-high,
+    .risk-medium,
+    .risk-low {
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid;
+        margin-top: 5px;
+    }
+
+    .risk-critical {
+        background: #FEF2F2;
+        border-color: #FECACA;
+    }
+
+    .risk-high {
+        background: #FFF7ED;
+        border-color: #FED7AA;
+    }
+
+    .risk-medium {
+        background: #FFFBEB;
+        border-color: #FDE68A;
+    }
+
+    .risk-low {
+        background: #F0FDF4;
+        border-color: #BBF7D0;
+    }
+
+
+    /* ========================================================
+       PROFILE
+       ======================================================== */
+
+    .profile-label {
+        font-size: 10px;
+        color: #94A3B8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 800;
+    }
+
+    .profile-title {
+        font-size: 25px;
+        font-weight: 800;
+        color: #0F172A;
+        margin-top: 7px;
+    }
+
+    .risk-badge-critical {
+        display: inline-block;
+        margin-top: 11px;
+        padding: 6px 11px;
+        border-radius: 999px;
+        background: #FEE2E2;
+        color: #B91C1C;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .risk-badge-high {
+        display: inline-block;
+        margin-top: 11px;
+        padding: 6px 11px;
+        border-radius: 999px;
+        background: #FFEDD5;
+        color: #C2410C;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .risk-badge-medium {
+        display: inline-block;
+        margin-top: 11px;
+        padding: 6px 11px;
+        border-radius: 999px;
+        background: #FEF3C7;
+        color: #A16207;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .risk-badge-low {
+        display: inline-block;
+        margin-top: 11px;
+        padding: 6px 11px;
+        border-radius: 999px;
+        background: #DCFCE7;
+        color: #15803D;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+
+    /* ========================================================
+       BUTTONS
+       ======================================================== */
+
+    .stButton > button {
+        border-radius: 9px;
+        font-weight: 700;
+    }
+
+    .stDownloadButton > button {
+        border-radius: 9px;
+        font-weight: 700;
+    }
+
+
+    /* ========================================================
+       INPUTS
+       ======================================================== */
+
+    div[data-baseweb="select"] > div {
+        border-radius: 9px;
+    }
+
+    input {
+        border-radius: 9px !important;
+    }
+
+
+    /* ========================================================
+       TABLE
+       ======================================================== */
+
+    [data-testid="stDataFrame"] {
+        border: 1px solid #E2E8F0;
+        border-radius: 12px;
+    }
+
+
+    /* ========================================================
+       FOOTER
+       ======================================================== */
+
+    .footer {
+        border-top: 1px solid #E2E8F0;
+        margin-top: 40px;
+        padding-top: 17px;
+        text-align: center;
+        color: #94A3B8;
+        font-size: 10px;
+    }
+
+    </style>
+    """),
+    unsafe_allow_html=True
+)
+
+
+# ============================================================
 # LOAD DATA
-# =========================================================
+# ============================================================
 
 @st.cache_data
 def load_data():
@@ -560,9 +552,9 @@ def load_data():
 df = load_data()
 
 
-# =========================================================
+# ============================================================
 # COMMON CALCULATIONS
-# =========================================================
+# ============================================================
 
 total_customers = df["customerID"].nunique()
 
@@ -588,27 +580,25 @@ at_risk = df[
 ]["customerID"].nunique()
 
 
-# =========================================================
+# ============================================================
 # SIDEBAR
-# =========================================================
+# ============================================================
 
 with st.sidebar:
 
     st.markdown(
-        """
+        textwrap.dedent("""
         <div class="brand">
-
-            <div>
-                <span class="brand-mark">◈</span>
-                <span class="brand-name">CHURNIQ</span>
-            </div>
-
-            <div class="brand-sub">
-                Customer Intelligence Platform
-            </div>
-
+        <div>
+        <span class="brand-mark">◆</span>
+        <span class="brand-name">CHURNIQ</span>
         </div>
-        """,
+
+        <div class="brand-sub">
+        Customer Intelligence Platform
+        </div>
+        </div>
+        """),
         unsafe_allow_html=True
     )
 
@@ -637,6 +627,7 @@ with st.sidebar:
         ):
 
             st.session_state.page = page_name
+
             st.session_state.pop(
                 "risk_quick_filter",
                 None
@@ -646,10 +637,6 @@ with st.sidebar:
 
     page = st.session_state.page
 
-    # =====================================================
-    # QUICK ACTIONS
-    # =====================================================
-
     st.markdown(
         '<div class="nav-label" style="margin-top:20px;">Quick Actions</div>',
         unsafe_allow_html=True
@@ -657,22 +644,20 @@ with st.sidebar:
 
     if st.button(
         "⚠   High-Risk Customers",
-        key="quick_high_risk",
         use_container_width=True
     ):
 
         st.session_state.page = "Customer Explorer"
         st.session_state.risk_quick_filter = True
-
         st.rerun()
 
     if st.button(
         "↻   Reset Workspace",
-        key="quick_reset",
         use_container_width=True
     ):
 
         st.session_state.page = "Executive Overview"
+
         st.session_state.pop(
             "risk_quick_filter",
             None
@@ -680,65 +665,61 @@ with st.sidebar:
 
         st.rerun()
 
-    # =====================================================
-    # MODEL CARD
-    # =====================================================
-
     st.markdown(
-        """
+        textwrap.dedent("""
         <div class="side-card">
 
-            <div class="side-card-title">
-                Model Status
-            </div>
+        <div class="side-card-title">
+        Model Status
+        </div>
 
-            <div class="side-model">
-                ● XGBoost Classifier
-            </div>
+        <div class="side-model">
+        ● XGBoost Classifier
+        </div>
 
-            <div class="side-row">
-                <span>ROC-AUC</span>
-                <b>0.841</b>
-            </div>
+        <div class="side-row">
+        <span>ROC-AUC</span>
+        <b>0.841</b>
+        </div>
 
-            <div class="side-row">
-                <span>Threshold</span>
-                <b>35%</b>
-            </div>
+        <div class="side-row">
+        <span>Threshold</span>
+        <b>35%</b>
+        </div>
 
-            <div class="side-row">
-                <span>Explainability</span>
-                <b>SHAP</b>
-            </div>
+        <div class="side-row">
+        <span>Explainability</span>
+        <b>SHAP</b>
+        </div>
 
         </div>
-        """,
+        """),
         unsafe_allow_html=True
     )
 
     st.markdown(
-        """
+        textwrap.dedent("""
         <div style="height:30px"></div>
 
         <div style="
-            color:#64748B;
-            font-size:10px;
-            line-height:1.8;
-            letter-spacing:.5px;
+        color:#64748B;
+        font-size:10px;
+        line-height:1.8;
+        letter-spacing:.5px;
         ">
 
-            DATA SCIENCE PORTFOLIO<br>
-            CUSTOMER RETENTION ANALYTICS
+        DATA SCIENCE PORTFOLIO<br>
+        CUSTOMER RETENTION ANALYTICS
 
         </div>
-        """,
+        """),
         unsafe_allow_html=True
     )
 
 
-# =========================================================
+# ============================================================
 # PAGE HEADER
-# =========================================================
+# ============================================================
 
 page_meta = {
 
@@ -775,181 +756,197 @@ page_meta = {
 
 eyebrow, title, subtitle = page_meta[page]
 
+
 st.markdown(
-    f"""
+    textwrap.dedent(f"""
     <div class="product-header">
 
-        <div>
+    <div>
 
-            <div class="eyebrow">
-                {eyebrow}
-            </div>
+    <div class="eyebrow">
+    {eyebrow}
+    </div>
 
-            <div class="main-title">
-                {title}
-            </div>
+    <div class="main-title">
+    {title}
+    </div>
 
-            <div class="main-subtitle">
-                {subtitle}
-            </div>
-
-        </div>
-
-        <div class="status-pill">
-            ● MODEL ONLINE
-        </div>
+    <div class="main-subtitle">
+    {subtitle}
+    </div>
 
     </div>
-    """,
+
+    <div class="status-pill">
+    ● MODEL ONLINE
+    </div>
+
+    </div>
+    """),
     unsafe_allow_html=True
 )
 
 
-# =========================================================
+# ============================================================
 # PAGE 1 — EXECUTIVE OVERVIEW
-# =========================================================
+# ============================================================
 
 if page == "Executive Overview":
 
     k1, k2, k3, k4, k5 = st.columns(5)
 
     with k1:
+
         st.markdown(
-            f"""
+            textwrap.dedent(f"""
             <div class="kpi-card">
 
-                <div class="kpi-top">
-                    <div class="kpi-label">
-                        TOTAL CUSTOMERS
-                    </div>
+            <div class="kpi-top">
 
-                    <div class="kpi-icon">
-                        ◉
-                    </div>
-                </div>
+            <div class="kpi-label">
+            TOTAL CUSTOMERS
+            </div>
 
-                <div class="kpi-value">
-                    {total_customers:,}
-                </div>
-
-                <div class="kpi-description">
-                    Active customer base
-                </div>
+            <div class="kpi-icon">
+            ◉
+            </div>
 
             </div>
-            """,
+
+            <div class="kpi-value">
+            {total_customers:,}
+            </div>
+
+            <div class="kpi-description">
+            Active customer base
+            </div>
+
+            </div>
+            """),
             unsafe_allow_html=True
         )
 
     with k2:
+
         st.markdown(
-            f"""
+            textwrap.dedent(f"""
             <div class="kpi-card">
 
-                <div class="kpi-top">
-                    <div class="kpi-label">
-                        CHURN RATE
-                    </div>
+            <div class="kpi-top">
 
-                    <div class="kpi-icon">
-                        %
-                    </div>
-                </div>
+            <div class="kpi-label">
+            CHURN RATE
+            </div>
 
-                <div class="kpi-value">
-                    {churn_rate:.1%}
-                </div>
-
-                <div class="kpi-description">
-                    Historical churn
-                </div>
+            <div class="kpi-icon">
+            %
+            </div>
 
             </div>
-            """,
+
+            <div class="kpi-value">
+            {churn_rate:.1%}
+            </div>
+
+            <div class="kpi-description">
+            Historical churn
+            </div>
+
+            </div>
+            """),
             unsafe_allow_html=True
         )
 
     with k3:
+
         st.markdown(
-            f"""
+            textwrap.dedent(f"""
             <div class="kpi-card">
 
-                <div class="kpi-top">
-                    <div class="kpi-label">
-                        AT-RISK CUSTOMERS
-                    </div>
+            <div class="kpi-top">
 
-                    <div class="kpi-icon">
-                        !
-                    </div>
-                </div>
+            <div class="kpi-label">
+            AT-RISK CUSTOMERS
+            </div>
 
-                <div class="kpi-value">
-                    {at_risk:,}
-                </div>
-
-                <div class="kpi-description">
-                    Probability ≥ 35%
-                </div>
+            <div class="kpi-icon">
+            !
+            </div>
 
             </div>
-            """,
+
+            <div class="kpi-value">
+            {at_risk:,}
+            </div>
+
+            <div class="kpi-description">
+            Probability ≥ 35%
+            </div>
+
+            </div>
+            """),
             unsafe_allow_html=True
         )
 
     with k4:
+
         st.markdown(
-            f"""
+            textwrap.dedent(f"""
             <div class="kpi-card">
 
-                <div class="kpi-top">
-                    <div class="kpi-label">
-                        HIGH / CRITICAL
-                    </div>
+            <div class="kpi-top">
 
-                    <div class="kpi-icon">
-                        ⚠
-                    </div>
-                </div>
+            <div class="kpi-label">
+            HIGH / CRITICAL
+            </div>
 
-                <div class="kpi-value">
-                    {high_risk:,}
-                </div>
-
-                <div class="kpi-description">
-                    Priority customers
-                </div>
+            <div class="kpi-icon">
+            ⚠
+            </div>
 
             </div>
-            """,
+
+            <div class="kpi-value">
+            {high_risk:,}
+            </div>
+
+            <div class="kpi-description">
+            Priority customers
+            </div>
+
+            </div>
+            """),
             unsafe_allow_html=True
         )
 
     with k5:
+
         st.markdown(
-            f"""
+            textwrap.dedent(f"""
             <div class="kpi-card">
 
-                <div class="kpi-top">
-                    <div class="kpi-label">
-                        AVG MODEL RISK
-                    </div>
+            <div class="kpi-top">
 
-                    <div class="kpi-icon">
-                        ◇
-                    </div>
-                </div>
+            <div class="kpi-label">
+            AVG MODEL RISK
+            </div>
 
-                <div class="kpi-value">
-                    {avg_probability:.1%}
-                </div>
-
-                <div class="kpi-description">
-                    Predicted probability
-                </div>
+            <div class="kpi-icon">
+            ◇
+            </div>
 
             </div>
-            """,
+
+            <div class="kpi-value">
+            {avg_probability:.1%}
+            </div>
+
+            <div class="kpi-description">
+            Predicted probability
+            </div>
+
+            </div>
+            """),
             unsafe_allow_html=True
         )
 
@@ -1068,32 +1065,32 @@ if page == "Executive Overview":
     ]["ChurnFlag"].mean()
 
     st.markdown(
-        f"""
+        textwrap.dedent(f"""
         <div class="insight-card">
 
-            <div class="insight-title">
-                ✦ Executive Insight
-            </div>
+        <div class="insight-title">
+        ✦ Executive Insight
+        </div>
 
-            <div class="insight-text">
-                Customers on month-to-month contracts show a
-                <b>{month_contract:.1%}</b> churn rate.
+        <div class="insight-text">
+        Customers on month-to-month contracts show a
+        <b>{month_contract:.1%}</b> churn rate.
 
-                The ML system currently flags
-                <b>{at_risk:,}</b> customers above the
-                <b>35% intervention threshold</b> for proactive
-                retention attention.
-            </div>
+        The ML system currently flags
+        <b>{at_risk:,}</b> customers above the
+        <b>35% intervention threshold</b> for proactive
+        retention attention.
+        </div>
 
         </div>
-        """,
+        """),
         unsafe_allow_html=True
     )
 
 
-# =========================================================
+# ============================================================
 # PAGE 2 — RISK ANALYTICS
-# =========================================================
+# ============================================================
 
 elif page == "Risk Analytics":
 
@@ -1172,39 +1169,33 @@ elif page == "Risk Analytics":
         else "$0"
     )
 
-    if len(filtered) > 0:
+    fig = px.scatter(
+        filtered,
+        x="tenure",
+        y="ChurnProbability",
+        size="MonthlyCharges",
+        color="RiskLevel",
+        hover_data=[
+            "customerID",
+            "Contract",
+            "MonthlyCharges"
+        ],
+        title="Customer Risk Map",
+        labels={
+            "tenure": "Tenure (months)",
+            "ChurnProbability": "Churn Probability"
+        }
+    )
 
-        fig = px.scatter(
-            filtered,
-            x="tenure",
-            y="ChurnProbability",
-            size="MonthlyCharges",
-            color="RiskLevel",
-            hover_data=[
-                "customerID",
-                "Contract",
-                "MonthlyCharges"
-            ],
-            title="Customer Risk Map",
-            labels={
-                "tenure": "Tenure (months)",
-                "ChurnProbability": "Churn Probability"
-            }
-        )
+    fig.update_layout(
+        template="plotly_white",
+        height=500
+    )
 
-        fig.update_layout(
-            template="plotly_white",
-            height=500
-        )
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
-
-    else:
-
-        st.warning("No customers match the selected filters.")
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
 
     st.caption(
         "Higher position indicates greater predicted churn probability. "
@@ -1212,9 +1203,9 @@ elif page == "Risk Analytics":
     )
 
 
-# =========================================================
+# ============================================================
 # PAGE 3 — CUSTOMER SEGMENTS
-# =========================================================
+# ============================================================
 
 elif page == "Customer Segments":
 
@@ -1322,9 +1313,9 @@ elif page == "Customer Segments":
     )
 
 
-# =========================================================
+# ============================================================
 # PAGE 4 — CHURN DRIVERS
-# =========================================================
+# ============================================================
 
 elif page == "Churn Drivers":
 
@@ -1382,33 +1373,6 @@ elif page == "Churn Drivers":
             "on the model's churn predictions."
         )
 
-        # FIXED MODEL INTERPRETATION
-        st.markdown(
-            '<div class="section-title">Key Findings</div>',
-            unsafe_allow_html=True
-        )
-
-        st.markdown(
-            """
-            <div class="insight-card">
-
-                <div class="insight-title">
-                    ◆ Model Interpretation
-                </div>
-
-                <div class="insight-text">
-                    The strongest retention risk signals are associated with
-                    <b>contract type</b>, <b>customer tenure</b>,
-                    <b>monthly charges</b>, and <b>payment method</b>.
-                    These variables should receive priority when designing
-                    customer retention strategies.
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
         st.markdown(
             '<div class="section-title">Feature Importance Table</div>',
             unsafe_allow_html=True
@@ -1426,25 +1390,44 @@ elif page == "Churn Drivers":
             hide_index=True
         )
 
-    except Exception as e:
+        # MODEL INTERPRETATION
+
+        st.markdown(
+            textwrap.dedent("""
+            <div class="insight-card">
+
+            <div class="insight-title">
+            ◆ MODEL INTERPRETATION
+            </div>
+
+            <div class="insight-text">
+            The strongest retention risk signals are associated with
+            <b>contract type</b>, <b>customer tenure</b>,
+            <b>monthly charges</b>, and <b>payment method</b>.
+            These variables should receive priority when designing
+            customer retention strategies.
+            </div>
+
+            </div>
+            """),
+            unsafe_allow_html=True
+        )
+
+    except Exception:
 
         st.error(
             "SHAP feature importance data could not be loaded."
         )
 
 
-# =========================================================
+# ============================================================
 # PAGE 5 — CUSTOMER EXPLORER
-# =========================================================
+# ============================================================
 
 elif page == "Customer Explorer":
 
     if "risk_quick_filter" not in st.session_state:
         st.session_state.risk_quick_filter = False
-
-    # =====================================================
-    # QUICK FILTER
-    # =====================================================
 
     if st.session_state.risk_quick_filter:
 
@@ -1457,10 +1440,7 @@ elif page == "Customer Explorer":
             "the 35% retention threshold."
         )
 
-        if st.button(
-            "← Show All Customers",
-            key="show_all_customers"
-        ):
+        if st.button("← Show All Customers"):
 
             st.session_state.risk_quick_filter = False
             st.rerun()
@@ -1469,9 +1449,10 @@ elif page == "Customer Explorer":
 
         explorer_df = df.copy()
 
-    # =====================================================
-    # CUSTOMER SELECTOR
-    # =====================================================
+    st.markdown(
+        '<div class="section-title">Customer Explorer</div>',
+        unsafe_allow_html=True
+    )
 
     customer_ids = sorted(
         explorer_df["customerID"]
@@ -1488,9 +1469,8 @@ elif page == "Customer Explorer":
         st.stop()
 
     customer_id = st.selectbox(
-        "Search Customer ID",
-        customer_ids,
-        key="customer_selector"
+        "Search / Select Customer ID",
+        customer_ids
     )
 
     customer = df[
@@ -1501,9 +1481,7 @@ elif page == "Customer Explorer":
         customer["ChurnProbability"]
     )
 
-    # =====================================================
-    # RISK CLASS
-    # =====================================================
+    # Risk styling
 
     if probability >= 0.70:
 
@@ -1529,58 +1507,54 @@ elif page == "Customer Explorer":
         badge_class = "risk-badge-low"
         risk_text = "Low Risk"
 
-    # =====================================================
+    # ========================================================
     # CUSTOMER PROFILE
-    #
-    # IMPORTANT:
-    # HTML is contained inside ONE Python string.
-    # Nothing here is printed as source code.
-    # =====================================================
+    # ========================================================
 
     st.markdown(
-        f"""
+        textwrap.dedent(f"""
         <div class="{risk_class}">
 
-            <div class="profile-label">
-                CUSTOMER PROFILE
-            </div>
+        <div class="profile-label">
+        CUSTOMER PROFILE
+        </div>
 
-            <div class="profile-title">
-                Customer {customer_id}
-            </div>
+        <div class="profile-title">
+        Customer {customer_id}
+        </div>
 
-            <span class="{badge_class}">
-                {risk_text}
-            </span>
+        <span class="{badge_class}">
+        {risk_text}
+        </span>
 
-            <div style="
-                margin-top:18px;
-                font-size:14px;
-                color:#374151;
-                line-height:1.7;
-            ">
+        <div style="
+        margin-top:18px;
+        color:#374151;
+        font-size:14px;
+        line-height:1.7;
+        ">
 
-                <b>Predicted Churn Probability:</b>
-                {probability:.1%}
+        <b>Predicted Churn Probability:</b>
+        {probability:.1%}
 
-                &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp; | &nbsp;&nbsp;
 
-                <b>Risk Level:</b>
-                {customer["RiskLevel"]}
-
-            </div>
+        <b>Risk Level:</b>
+        {customer["RiskLevel"]}
 
         </div>
-        """,
+
+        </div>
+        """),
         unsafe_allow_html=True
     )
 
-    # =====================================================
-    # CUSTOMER PROFILE METRICS
-    # =====================================================
+    # ========================================================
+    # CUSTOMER DETAILS
+    # ========================================================
 
     st.markdown(
-        '<div class="section-title">Customer Details</div>',
+        '<div class="section-title">Customer Profile Details</div>',
         unsafe_allow_html=True
     )
 
@@ -1606,11 +1580,9 @@ elif page == "Customer Explorer":
         customer["InternetService"]
     )
 
-    # =====================================================
+    # ========================================================
     # RETENTION RECOMMENDATION
-    #
-    # FIXED — no raw HTML is displayed
-    # =====================================================
+    # ========================================================
 
     st.markdown(
         '<div class="section-title">Retention Recommendation</div>',
@@ -1622,26 +1594,64 @@ elif page == "Customer Explorer":
         "Customers classified as High or Critical Risk should be prioritized for proactive retention campaigns, personalized offers and customer support follow-ups."
     )
 
+    if pd.isna(recommendation):
+        recommendation = (
+            "Customers classified as High or Critical Risk "
+            "should be prioritized for proactive retention "
+            "campaigns, personalized offers and customer "
+            "support follow-ups."
+        )
+
     st.markdown(
-        f"""
+        textwrap.dedent(f"""
         <div class="insight-card">
 
-            <div class="insight-title">
-                ◆ Recommended Action
-            </div>
+        <div class="insight-title">
+        ◆ RETENTION RECOMMENDATION
+        </div>
 
-            <div class="model-text">
-                {recommendation}
-            </div>
+        <div class="model-text">
+        {recommendation}
+        </div>
 
         </div>
-        """,
+        """),
         unsafe_allow_html=True
     )
 
-    # =====================================================
+    # ========================================================
+    # MODEL INTERPRETATION
+    # ========================================================
+
+    st.markdown(
+        '<div class="section-title">Model Interpretation</div>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        textwrap.dedent("""
+        <div class="insight-card">
+
+        <div class="insight-title">
+        ◆ MODEL INTERPRETATION
+        </div>
+
+        <div class="insight-text">
+        The strongest retention risk signals are associated with
+        <b>contract type</b>, <b>customer tenure</b>,
+        <b>monthly charges</b>, and <b>payment method</b>.
+        These variables should receive priority when designing
+        customer retention strategies.
+        </div>
+
+        </div>
+        """),
+        unsafe_allow_html=True
+    )
+
+    # ========================================================
     # PRIORITY CUSTOMER LIST
-    # =====================================================
+    # ========================================================
 
     st.markdown(
         '<div class="section-title">Priority Customer List</div>',
@@ -1672,14 +1682,16 @@ elif page == "Customer Explorer":
     ]
 
     st.dataframe(
-        priority[available_columns].head(50),
+        priority[
+            available_columns
+        ].head(50),
         use_container_width=True,
         hide_index=True
     )
 
-    # =====================================================
+    # ========================================================
     # EXPORT
-    # =====================================================
+    # ========================================================
 
     st.download_button(
         "↓  Export Priority Customers",
@@ -1687,24 +1699,23 @@ elif page == "Customer Explorer":
             available_columns
         ].to_csv(index=False),
         file_name="priority_customer_list.csv",
-        mime="text/csv",
-        key="export_priority"
+        mime="text/csv"
     )
 
 
-# =========================================================
+# ============================================================
 # FOOTER
-# =========================================================
+# ============================================================
 
 st.markdown(
-    """
+    textwrap.dedent("""
     <div class="footer">
 
-        CHURNIQ • CUSTOMER CHURN INTELLIGENCE
-        <br>
-        XGBoost • K-Means • SHAP • Streamlit
+    CHURNIQ • CUSTOMER CHURN INTELLIGENCE
+    <br>
+    XGBoost • K-Means • SHAP • Streamlit
 
     </div>
-    """,
+    """),
     unsafe_allow_html=True
 )
