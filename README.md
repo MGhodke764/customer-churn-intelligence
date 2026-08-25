@@ -148,14 +148,12 @@ These values are used to explain the relative importance of features in the chur
 ### Running the Application
 Install the required dependencies:
 
-Bash
 
 pip install -r requirements.txt
 Run the Streamlit application:
 
-Bash
-
 streamlit run app.py
+
 The application can also be deployed directly through GitHub + Streamlit Community Cloud, with app.py, requirements.txt, and the required CSV files stored in the same repository.
 
 ### Business Objective
